@@ -1,0 +1,10 @@
+version: "3.2"
+services:
+  shib:
+    image: kristophjunge/test-saml-idp
+    ports:
+    - "8080:8080"
+    - "8443:8443"
+    environment:
+    - SIMPLESAMLPHP_SP_ENTITY_ID=http://localhost:8000/hub/metadata/
+    - SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE=http://localhost:8000/hub/acs

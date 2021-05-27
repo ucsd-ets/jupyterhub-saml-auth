@@ -1,0 +1,6 @@
+.devcontainer/
+__pycache__
+*.pyc
+*.sqlite
+*.egg-info
+jupyterhub_cookie_secret
