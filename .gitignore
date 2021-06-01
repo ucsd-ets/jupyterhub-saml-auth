@@ -12,3 +12,5 @@ lib/
 *.png
 share/
 *.log
+*.pid
+*.cfg
