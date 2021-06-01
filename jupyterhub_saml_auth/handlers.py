@@ -1,6 +1,7 @@
 from jupyterhub.handlers import LoginHandler, BaseHandler, LogoutHandler
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 import tornado
+from tornado.log import app_log
 import tornado.web
 import os
 
@@ -70,12 +71,10 @@ class MetadataHandler(BaseHandler, BaseHandlerMixin):
             self.write(', '.join(errors))
 
 class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
-    @staticmethod
-    def get_saml_settings_path():
-        return saml_settings_path
-
     async def get(self):
         request = get_request(self.request)
+        app_log.info(request)
+        app_log.info('\n\n\n\n')
         auth = OneLogin_Saml2_Auth(request, custom_base_path=self.saml_settings_path)
     
         return_to = f'{self.request.host}/acs'
@@ -105,18 +104,19 @@ class ACSHandler(BaseHandler, BaseHandlerMixin):
         auth = OneLogin_Saml2_Auth(request, custom_base_path=self.saml_settings_path)
         error_reason = None
         attributes = False
-        paint_logout = False
-        success_slo = False
 
         auth.process_response()
         errors = auth.get_errors()
+        
+        # FIXME add error handling
         not_auth_warn = not auth.is_authenticated()
 
         user_data = auth.get_attributes()
         username = self.extract_username(user_data)
-            
+        
         user = await self.login_user({'name': username})
         if user is None:
             # todo: custom error page?
             raise tornado.web.HTTPError(403)
         self.redirect(self.get_next_url(user))
+

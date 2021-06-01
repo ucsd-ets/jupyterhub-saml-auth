@@ -4,18 +4,21 @@ import subprocess
 from tornado.log import app_log
 
 def extract_username(acs_handler, attributes):
+    app_log.info(attributes)
+    app_log.info('\n\n\n\n\n')
     email = attributes['email'][0]
     username = email.split('@')[0]
     return username
 
-c.SamlAuthenticator.saml_settings_path = '/workspaces/jupyterhub-saml-auth/etc'
-c.SamlAuthenticator.session_cookie_names = {'PHPSESSIDIDP', 'SimpleSAMLAuthTokenIdp'}
-c.SamlAuthenticator.extract_username = extract_username
+c.SAMLAuthenticator.saml_settings_path = '/app/etc'
+c.SAMLAuthenticator.session_cookie_names = {'PHPSESSIDIDP', 'SimpleSAMLAuthTokenIdp'}
+c.SAMLAuthenticator.extract_username = extract_username
 
-c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.authenticator.SamlAuthenticator'
+c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.authenticator.SAMLAuthenticator'
 
 
 def pre_spawn_hook(spawner):
+    # create the user if it doesnt exist
     username = spawner.user.name
     try:
         pwd.getpwnam(username)

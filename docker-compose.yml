@@ -1,6 +1,6 @@
 version: "3.2"
 services:
-  shib:
+  idp:
     image: kristophjunge/test-saml-idp
     ports:
     - "8080:8080"
@@ -8,3 +8,15 @@ services:
     environment:
     - SIMPLESAMLPHP_SP_ENTITY_ID=http://localhost:8000/hub/metadata/
     - SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE=http://localhost:8000/hub/acs
+  jupyterhub:
+    build: .
+    ports:
+    - "8000:8000"
+    volumes:
+    - "./etc:/etc/saml"
+    - ".:/app"
+    - "./test/jupyterhub_config.py:/etc/jupyterhub-saml-auth/jupyterhub_config.py"
+    command:
+    - jupyterhub
+    - --config
+    - /etc/jupyterhub-saml-auth/jupyterhub_config.py

@@ -5,7 +5,7 @@ import os
 from .handlers import *
 
 
-class SamlAuthenticator(Authenticator):
+class SAMLAuthenticator(Authenticator):
 
     acs_handler = ACSHandler
     metadata_handler = MetadataHandler
@@ -31,8 +31,9 @@ class SamlAuthenticator(Authenticator):
     extract_username = Callable(
         help='''
         Extract the username from the attributes returned by the IdP.
-
-        1. Takes in a dict with the attributes, must return a username as a string
+        
+        1. the ACSHandler instance if needed
+        2. Takes in a dict with the attributes, must return a username as a string
         ''',
         config=True
     )
@@ -59,7 +60,7 @@ class SamlAuthenticator(Authenticator):
         
         for f in files_to_check:
             if f not in dir_contents:
-                raise FileNotFoundError(f'Could not locate {f} in saml settings path. Path = {proposed_path}, contents = {dir_contents}')
+                raise FileNotFoundError(f'Could not locate {f} in saml settings path. Path = {path}, contents = {dir_contents}')
     
     def authenticate(self, handler, data):
         return data['name']
