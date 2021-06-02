@@ -20,17 +20,19 @@ def extract_username(acs_handler, attributes):
     username = email.split('@')[0]
     return username
 
-# The configuration path is for OneLogin's python3-saml package
+# The configuration path is for OneLogin's python3-saml package. This directory is where
+# settings.json & advanced_settings.json go. See https://github.com/onelogin/python3-saml
+# for more info about this
 c.SAMLAuthenticator.saml_settings_path = '/app/etc'
 
 # The cookies that your IdP uses for maintaining a login session. These will be cleared
 # once the user hits 'logout'
 c.SAMLAuthenticator.session_cookie_names = {'PHPSESSIDIDP', 'SimpleSAMLAuthTokenIdp'}
 
-# Function that pulls the username from the SAML attributes.
+# Function that extracts the username from the SAML attributes.
 c.SAMLAuthenticator.extract_username = extract_username
 
-# register the SAML authenticator
+# register the SAML authenticator with jupyterhub
 c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.authenticator.SAMLAuthenticator'
 ```
 
@@ -42,6 +44,7 @@ c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.authenticator.SAMLAuthe
 - docker compose
 - python3
 - Firefox or Chrome
+
 ### Create a development environment
 
 ```bash
