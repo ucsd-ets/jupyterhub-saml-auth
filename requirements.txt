@@ -4,3 +4,4 @@ pytest
 traitlets>=5.0.0
 notebook
 selenium
+flake8

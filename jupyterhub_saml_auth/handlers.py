@@ -13,6 +13,7 @@ __all__ = [
     'ACSHandler'
 ]
 
+
 def get_request(request):
     dataDict = {}
     for key in request.arguments:
@@ -30,11 +31,13 @@ def get_request(request):
 
     return result
 
+
 class BaseHandlerMixin:
+
     @property
     def saml_settings_path(self):
         return self._saml_settings_path
-    
+
     @saml_settings_path.setter
     def saml_settings_path(self, path):
         self._saml_settings_path_exists(path)
@@ -45,21 +48,29 @@ class BaseHandlerMixin:
     def _saml_settings_path_exists(self, path):
         # error checks
         if not os.path.exists(path):
-            raise NotADirectoryError(f'Could not locate saml settings path at {path}')
-        
+            raise NotADirectoryError(f'Could not locate \
+                saml settings path at {path}')
+
     def _settings_files_exist(self, path):
         dir_contents = os.listdir(path)
-        
+
         files_to_check = ['settings.json', 'advanced_settings.json']
-        
+
         for f in files_to_check:
             if f not in dir_contents:
-                raise FileNotFoundError(f'Could not locate {f} in saml settings path. Path = {path}, contents = {dir_contents}')
+                raise FileNotFoundError(f'Could not locate {f} in saml \
+                    settings path. Path = {path}, contents \
+                    = {dir_contents}')
+
 
 class MetadataHandler(BaseHandler, BaseHandlerMixin):
+
     def get(self):
         request = get_request(self.request)
-        auth = OneLogin_Saml2_Auth(request, custom_base_path=self.saml_settings_path)
+        auth = OneLogin_Saml2_Auth(
+            request,
+            custom_base_path=self.saml_settings_path
+        )
         saml_settings = auth.get_settings()
         metadata = saml_settings.get_sp_metadata()
         errors = saml_settings.validate_metadata(metadata)
@@ -68,55 +79,70 @@ class MetadataHandler(BaseHandler, BaseHandlerMixin):
             self.set_header('Content-Type', 'text/xml')
             self.write(metadata)
         else:
+            app_log.error(f'Could not serve metadata. Errors = {errors}')
             self.write(', '.join(errors))
 
+
 class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
+
     async def get(self):
         request = get_request(self.request)
-        app_log.info(request)
-        app_log.info('\n\n\n\n')
-        auth = OneLogin_Saml2_Auth(request, custom_base_path=self.saml_settings_path)
-    
+        auth = OneLogin_Saml2_Auth(
+            request,
+            custom_base_path=self.saml_settings_path
+        )
+
         return_to = f'{self.request.host}/acs'
         return self.redirect(auth.login(return_to))
 
+
 class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
+
     @property
     def session_cookie_names(self):
         try:
             return self._session_cookie_names
         except AttributeError:
             return []
-    
+
     @session_cookie_names.setter
     def session_cookie_names(self, cookies):
         if not isinstance(cookies, set):
-            raise TypeError(f'session_cookie_names must be a set, not {type(cookies)}')
+            raise TypeError(f'session_cookie_names must \
+                be a set, not {type(cookies)}')
         self._session_cookie_names = list(cookies)
 
     async def handle_logout(self):
         for cookie in self.session_cookie_names:
             self.clear_cookie(cookie)
 
+
 class ACSHandler(BaseHandler, BaseHandlerMixin):
     async def post(self):
         request = get_request(self.request)
-        auth = OneLogin_Saml2_Auth(request, custom_base_path=self.saml_settings_path)
-        error_reason = None
-        attributes = False
+        auth = OneLogin_Saml2_Auth(
+            request,
+            custom_base_path=self.saml_settings_path
+        )
 
         auth.process_response()
         errors = auth.get_errors()
-        
-        # FIXME add error handling
-        not_auth_warn = not auth.is_authenticated()
+
+        if len(errors) != 0:
+            app_log.error(f'SAML authentication error. Errors = {errors}')
+            raise tornado.web.HTTPError(500)
+
+        if not auth.is_authenticated():
+            app_log.error('SAML User is not authenticated!')
+            raise tornado.web.HTTPError(401)
 
         user_data = auth.get_attributes()
         username = self.extract_username(user_data)
-        
+
         user = await self.login_user({'name': username})
         if user is None:
-            # todo: custom error page?
+            app_log.error(f'Could not log in user via jupyterhub. \
+                username = {username}')
+
             raise tornado.web.HTTPError(403)
         self.redirect(self.get_next_url(user))
-
