@@ -54,6 +54,6 @@ jobs:
         docker-compose up -d
     - name: run automated tests
       run: |
-        pytest tests --browser chrome --headless
+        pytest test --browser chrome --headless
 
 

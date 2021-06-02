@@ -1,22 +1,20 @@
 from jupyterhub_saml_auth.authenticator import SAMLAuthenticator
 import unittest
-import unittest.mock
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions
-import os
 import time
 import pytest
 
 SECONDS_WAIT = 15
 
+
 @pytest.fixture()
 def driver(pytestconfig):
     browser = pytestconfig.getoption("browser")
     headless = pytestconfig.getoption('headless')
-    
+
     if browser == 'firefox':
         options = webdriver.FirefoxOptions()
         if headless:
