@@ -50,7 +50,8 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 jupyterhub_saml_auth --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Start docker containers
-      run: docker compose up -d
+      run: |
+        docker-compose up -d
     - name: run automated tests
       run: |
         pytest tests --browser chrome --headless
