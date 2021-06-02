@@ -49,9 +49,20 @@ c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.authenticator.SAMLAuthe
 python3 -m venv .
 source bin/activate
 pip install -r requirements.txt
+
+# start the docker containers
+docker compose up -d
 ```
 
-### Run the tests
+### Test the authentication process
+
+The application and IdP runs as docker containers and bind to ports: 8000, 8443, and 8080. You can navigate to `localhost:8000` in your browser to begin testing and to login via SAML, navigate to `localhost:8000/hub/saml_login`. The user registered in the IdP is `user1` with password `user1pass`.
+
+### Kill your docker environment
+
+To kill the docker containers, run the command `docker compose down` at the project root.
+
+### Run the automated tests
 
 The commands below kick off a selenium end-to-end test that will test the full authentication and logout process.
 
