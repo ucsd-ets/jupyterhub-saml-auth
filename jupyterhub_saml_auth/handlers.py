@@ -54,7 +54,7 @@ class BaseHandlerMixin:
         
         for f in files_to_check:
             if f not in dir_contents:
-                raise FileNotFoundError(f'Could not locate {f} in saml settings path. Path = {proposed_path}, contents = {dir_contents}')
+                raise FileNotFoundError(f'Could not locate {f} in saml settings path. Path = {path}, contents = {dir_contents}')
 
 class MetadataHandler(BaseHandler, BaseHandlerMixin):
     def get(self):
