@@ -20,7 +20,7 @@ def get_version(rel_path):
 
 setup(name='jupyterhub_saml_auth',
       version=get_version('jupyterhub_saml_auth/__init__.py'),
-      python_requires='>=3.6.5',
+      python_requires='>=3.7.0',
       description='Authenticate your Jupyterhub users using SAML.',
       author='Wesley Uykimpang',
       url='https://github.com/ucsd-ets/jupyterhub-saml-auth',
