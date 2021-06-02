@@ -41,8 +41,8 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Install Google Chrome # Using shell script to install Google Chrome
       run: |
-       chmod +x ./scripts/InstallChrome.sh
-        ./scripts/InstallChrome.sh
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo apt install ./google-chrome-stable_current_amd64.deb
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
