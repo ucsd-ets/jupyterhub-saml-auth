@@ -81,8 +81,8 @@ class SAMLAuthenticator(Authenticator):
         self.metadata_handler.saml_settings_path = self.saml_settings_path
         self.acs_handler.saml_settings_path = self.saml_settings_path
         self.logout_handler.saml_settings = self.saml_settings_path
-        self.logout_handler.session_cookie_names = self.session_cookie_names
 
+        self.logout_handler.session_cookie_names = self.session_cookie_names
         self.acs_handler.extract_username = self.extract_username
 
     def get_handlers(self, app):

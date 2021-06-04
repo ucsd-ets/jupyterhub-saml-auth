@@ -1,5 +1,7 @@
 # Jupyterhub SAML Auth
 
+[![image](https://badge.fury.io/py/jupyterhub-saml-auth.svg)](https://pypi.org/project/jupyterhub-saml-auth/)
+
 Authenticate your Jupyterhub users using SAML. This authenticator uses OneLogin's [python3-saml](https://github.com/onelogin/python3-saml) package as a backend API for handling SAML authentication.
 
 ## Installation
@@ -33,7 +35,7 @@ c.SAMLAuthenticator.session_cookie_names = {'PHPSESSIDIDP', 'SimpleSAMLAuthToken
 c.SAMLAuthenticator.extract_username = extract_username
 
 # register the SAML authenticator with jupyterhub
-c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.authenticator.SAMLAuthenticator'
+c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.SAMLAuthenticator'
 ```
 
 ## Development

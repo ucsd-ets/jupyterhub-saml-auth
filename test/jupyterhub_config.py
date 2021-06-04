@@ -14,7 +14,7 @@ c.SAMLAuthenticator.saml_settings_path = '/app/etc'
 c.SAMLAuthenticator.session_cookie_names = {'PHPSESSIDIDP', 'SimpleSAMLAuthTokenIdp'}
 c.SAMLAuthenticator.extract_username = extract_username
 
-c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.authenticator.SAMLAuthenticator'
+c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.SAMLAuthenticator'
 
 
 def pre_spawn_hook(spawner):
