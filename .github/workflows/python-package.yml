@@ -46,7 +46,7 @@ jobs:
     - name: Install Firefox
       run: |
         python -m pip install webdrivermanager
-        webdrivermanager firefox --linkpath /usr/local/bin
+        sudo webdrivermanager firefox --linkpath /usr/local/bin
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
