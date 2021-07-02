@@ -2,29 +2,29 @@
     "strict": true,
     "debug": true,
     "sp": {
-        "entityId": "http://datahub-dev.ucsd.edu/hub/metadata/",
+        "entityId": "http://localhost:8000/hub/metadata/",
         "assertionConsumerService": {
-            "url": "http://ldatahub-dev.ucsd.edu/hub/saml_login/",
+            "url": "http://localhost:8000/hub/saml_login/",
             "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
         },
         "singleLogoutService": {
-            "url": "",
+            "url": "http://localhost:8000/?sls",
             "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
         },
         "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
-        "x509cert": "",
-        "privateKey": ""
+        "x509cert": "MIIDUjCCAjoCCQDBNW8wJGEzmjANBgkqhkiG9w0BAQsFADBrMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTESMBAGA1UEBwwJU2FuIERpZWdvMQ0wCwYDVQQKDARVQ1NEMQswCQYDVQQLDAJVQzEXMBUGA1UEAwwObG9jYWxob3N0OjgwMDAwHhcNMjEwNTEzMjE1NjQ5WhcNMzEwNTEzMjE1NjQ5WjBrMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTESMBAGA1UEBwwJU2FuIERpZWdvMQ0wCwYDVQQKDARVQ1NEMQswCQYDVQQLDAJVQzEXMBUGA1UEAwwObG9jYWxob3N0OjgwMDAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMeJQFdRE80T/YgWhbDzWs3HYPQZyiO+/dme34nub0ec7/v5av7ox5xgKO/5b+5Rw6uSXHFNjyYbj9stcEyBHfS2Q3LIK7mgwknmFL3+Yqr4bvC+a4Li2giEOGXvA1IBeufqDX28U9QvAzp0fxPWuL2tyYidzEpU+eN+rDDEtqfuvL0vJmQK5CCYd5ws8zYn3e0Z4Bel5+cWazeZJYmAqKAPNlOhwZFXs3MbuWRZZ+cHPaX8vFr2HmeU+b1PvHv7a33mnHm1bDscpbRf1PzG7Pe1oZ3KI+JIjmJtJ5KeTu7XbCJnDxzlzR6D2F2D2x0gHSEJtsTVS9EnhdiOanRMS7AgMBAAEwDQYJKoZIhvcNAQELBQADggEBAMe05uvCutt930VuoYoYpcpRWimb4hvoQMWtcz08QWdh6L9d0slvUa5xo7ZjdBqw9HWpIQHxK+1OrxSqrCl7+Mgh5hT8M3MMCcYv3TlCbErHRp1/6GyAqmHtyJSsb0i+rVmWM0R0/JzkeyTkUEMNgvFdT3CbjoKpqB1zzpU8V4rcr4sT7ONnVFtbRwuYk5nfYckA/UvpT2ywZpB5I3V3GDeQHbEZFNSJm1mJuTdlMUcwynF8ASI9OYoHEt6lg1nqjWZcCKbE4NzZRT2MjYoZrQVFyWFSlfT9UtNG6NYZ7LIKcSGsLHttzuAdMtAgLsEGrKpn1AOaKf/SgVHS4H/tR4A=",
+        "privateKey": "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDMeJQFdRE80T/YgWhbDzWs3HYPQZyiO+/dme34nub0ec7/v5av7ox5xgKO/5b+5Rw6uSXHFNjyYbj9stcEyBHfS2Q3LIK7mgwknmFL3+Yqr4bvC+a4Li2giEOGXvA1IBeufqDX28U9QvAzp0fxPWuL2tyYidzEpU+eN+rDDEtqfuvL0vJmQK5CCYd5ws8zYn3e0Z4Bel5+cWazeZJYmAqKAPNlOhwZFXs3MbuWRZZ+cHPaX8vFr2HmeU+b1PvHv7a33mnHm1bDscpbRf1PzG7Pe1oZ3KI+JIjmJtJ5KeTu7XbCJnDxzlzR6D2F2D2x0gHSEJtsTVS9EnhdiOanRMS7AgMBAAECggEBAKzkHA1NQqkRKhIwwgOVJcanl3ApA3+ufJD9UloSSqlXwe9AmfLjG4bwJkOx3IRlR+xjl4zxlMvGU7y5FtTlMy+DORbqHRTyGehwv0Z/6MgZKVhB0PHVoiEGd0pMRoI1Q7D5Q5miK/I0ApU6kjtquuBDzJlyoOjp+xuGnowUfkRp0EORH5uklCt4x4A+3nA7+nLu8XyuyoM4pSb/n2E15I+iolPIfZLou9pAN/7wuNGzN4IMcN7rxRkHjulAObER0L3Yk0xSw2F2vpbgnXac0W5n9INKhQbpQ29PtDI8CdIvcrFTcsnttnkDcp/eKoUbBZ8qvk8AdafziyyI5qTdy3kCgYEA7uSAJPJrhLQu6dl3NYMSLKbkuWFnlv3JXyCJEsmRFwibkDthkEhVDUGoCCstqGuRFj/XGnSKJ8j89bo9vIpQM9GUhJkECLrneHuTtvRYsoIk7eLKzWy3HWOs7+CqflZsTxoPQWtqoMhQKEBbMptkg+MiKoUt0EiqUoqlH9p7z80CgYEA2x0LRBBknR2JJczyj9uImuE50qIh6GrzzMty0WNUCU7VKS84LAr3sioN3nWQIEmrzLqgjb+STDmsC4cO41IY3FfInzG2smx5Leun42EegIpwvv6BjDoYJxzPXGKCypZ8BeNCRd+Odc0O3I8Gjka4K6H5lzvKCUmNvgAk1IavDqcCgYEAmBgY0e0ZsSJ6n94ZfJNXdeBHzRMLveEUXSE8xB5a5pxPVrPHuPGkXM1JavH6nrjlZZH9pFVARHY9P0F03t38lBFCCm3VWK2Og3HCKQBGnFgppN74mXM23lpAl3Sld8wUJwSDY/Y8q+L8zbOznHO8ug9ZCFNESNCKyASHftE+dJ0CgYEA1sAYkpUeh36zNIEyGxynPmUQLwkJAqoQWN/toJsheh3xfXPyMfht3AirnyTKJVsPLpCbW1IvKNY9cO7mAJYuF4dR8fTfgvAdtIwK+CfvpTwKVKdMgQtPMMZj1cAXQEdNNtgN1D3PelWIA1OKsVdOmjUeUsMeuQuGCHpLnqCCYnECgYBVSdL4thWPdwOV58adJmcMANjG2xioRAdbp+d4nNkEU7s6kNrNB94Kt0p/AvwdT8jS4wpKfshoG66Ci2mA11Y+AP6yzwjTF8DtRu2uE8hUQ7CI/xoRz6F9gJHZjfuSfdINjvZF8hvtzmDJ1e2zCDS9/pYvK7adLdpw3qX+9bfgNA=="
     },
     "idp": {
-        "entityId": "https://a4.ucsd.edu/shibboleth",
+        "entityId": "http://localhost:8080/simplesaml/saml2/idp/metadata.php",
         "singleSignOnService": {
-            "url": "https://a4-test.ucsd.edu/testidp/profile/SAML2/POST/SSO",
+            "url": "http://localhost:8080/simplesaml/saml2/idp/SSOService.php",
             "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
         },
         "singleLogoutService": {
-            "url": "",
+            "url": "http://localhost:8080/simplesaml/saml2/idp/SingleLogoutService.php",
             "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
         },
-        "x509cert": "MIIC9jCCAd6gAwIBAgIJAJVf9Zyk5ITIMA0GCSqGSIb3DQEBBQUAMCkxJzAlBgNVBAMTHmh0dHBzOi8vYTQudWNzZC5lZHUvc2hpYmJvbGV0aDAeFw0xNDA5MDIxNjMyMjdaFw0yNDA4MzAxNjMyMjdaMCkxJzAlBgNVBAMTHmh0dHBzOi8vYTQudWNzZC5lZHUvc2hpYmJvbGV0aDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANEVDD73IdU/jduUbk+9Sa0zNBCs5igBKQ2X6Z4znZOYvk2yEGz4sNp/CmKNeyDPAa0LrZiiYEy+innWGG9pY8QpI+f4z5OCSmSq9uNC9gwMzfCPiI4fmMWjdlG0z4ZOBhDCxrVUS48jg0Exw7Ak4SB1ssJWqPcq7CYgXK+2DfJvtpWMNe2utYw+D0cfonymSy1LRMfKssIH0MHSLTwu4nX6h4cE4X4DLW3HF+7l7rimkeWkLhovQF04TAIYnAcBhiY0Z/uz/NpwppRhz4MQvqbWkLwBJ2Hjy2EKsRdIMr8epAcXSXweC/Fo810C2sJ28zDG6iyQDHRaVVEM6uyYz8kCAwEAAaMhMB8wHQYDVR0OBBYEFFAVPGZDvzSpgBMFJ2qWgaNcaziZMA0GCSqGSIb3DQEBBQUAA4IBAQCnHl/NWsmsIOnLd5t62pbLTjzDpOyxVsLfWlm+SWWdnWIaQg8Tzu1wdoS0b12hSb9vmyA2Pxx7s8sQw9f4AgZ9rgFLbuZ4cB9fxQyf4EhbiqwuD7ucaK4Ys2X0RC4PAVFPoy/V35OQyROpZFpLKQf49j5FnLw3PgN5FPFH3mhFBXQTAI/zPtUyCg3VlFh71AMNo+rHep/oacIPlxYyNWrtwQ1LHSjO7ta15T4Kem84A6MvdJWAdqeeX4DiW6wFgvi+HdNBX+dvQ53wX3oPfNVr9N+pN6E6OwLWG1WBnlcp0Mm0A2UFtEUCKdTLEHmsB+v+6PsjNKu6XYkVXR9sxRF/"
+        "x509cert": "MIIDXTCCAkWgAwIBAgIJALmVVuDWu4NYMA0GCSqGSIb3DQEBCwUAMEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwHhcNMTYxMjMxMTQzNDQ3WhcNNDgwNjI1MTQzNDQ3WjBFMQswCQYDVQQGEwJBVTETMBEGA1UECAwKU29tZS1TdGF0ZTEhMB8GA1UECgwYSW50ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzUCFozgNb1h1M0jzNRSCjhOBnR+uVbVpaWfXYIR+AhWDdEe5ryY+CgavOg8bfLybyzFdehlYdDRgkedEB/GjG8aJw06l0qF4jDOAw0kEygWCu2mcH7XOxRt+YAH3TVHa/Hu1W3WjzkobqqqLQ8gkKWWM27fOgAZ6GieaJBN6VBSMMcPey3HWLBmc+TYJmv1dbaO2jHhKh8pfKw0W12VM8P1PIO8gv4Phu/uuJYieBWKixBEyy0lHjyixYFCR12xdh4CA47q958ZRGnnDUGFVE1QhgRacJCOZ9bd5t9mr8KLaVBYTCJo5ERE8jymab5dPqe5qKfJsCZiqWglbjUo9twIDAQABo1AwTjAdBgNVHQ4EFgQUxpuwcs/CYQOyui+r1G+3KxBNhxkwHwYDVR0jBBgwFoAUxpuwcs/CYQOyui+r1G+3KxBNhxkwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAAiWUKs/2x/viNCKi3Y6blEuCtAGhzOOZ9EjrvJ8+COH3Rag3tVBWrcBZ3/uhhPq5gy9lqw4OkvEws99/5jFsX1FJ6MKBgqfuy7yh5s1YfM0ANHYczMmYpZeAcQf2CGAaVfwTTfSlzNLsF2lW/ly7yapFzlYSJLGoVE+OHEu8g5SlNACUEfkXw+5Eghh+KzlIN7R6Q7r2ixWNFBC/jWf7NKUfJyX8qIG5md1YUeT6GBW9Bm2/1/RiO24JTaYlfLdKK9TYb8sG5B+OLab2DImG99CJ25RkAcSobWNF5zD0O6lgOo3cEdB/ksCq3hmtlC/DlLZ/D8CJ+7VuZnS1rR2naQ=="
     }
 }
