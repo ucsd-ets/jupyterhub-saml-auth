@@ -16,19 +16,19 @@
     },
     "contactPerson": {
         "technical": {
-            "givenName": "technical_name",
-            "emailAddress": "technical@example.com"
+            "givenName": "Datahub Team",
+            "emailAddress": "datahub@ucsd.edu"
         },
         "support": {
-            "givenName": "support_name",
-            "emailAddress": "support@example.com"
+            "givenName": "Datahub Team",
+            "emailAddress": "datahub@ucsd.edu"
         }
     },
     "organization": {
         "en-US": {
-            "name": "sp_test",
-            "displayname": "SP test",
-            "url": "http://sp.example.com"
+            "name": "UCSD",
+            "displayname": "University of California, San Diego",
+            "url": "https://ucsd.edu"
         }
     }
 }

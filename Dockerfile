@@ -17,5 +17,4 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
     npm install -g configurable-http-proxy
 
 RUN pip install --upgrade pip &&  \
-    pip install -r requirements.txt && \
     pip install -e .
