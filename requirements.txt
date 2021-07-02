@@ -1,5 +1,4 @@
 jupyterhub
-python3-saml
 pytest
 traitlets>=5.0.0
 notebook
