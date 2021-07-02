@@ -55,6 +55,9 @@ python3 -m venv .
 source bin/activate
 pip install -r requirements.txt
 
+# OPTIONAL, install package if developing source code
+pip install -e .
+
 # start the docker containers
 docker compose up -d
 ```

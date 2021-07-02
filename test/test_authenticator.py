@@ -1,4 +1,3 @@
-from jupyterhub_saml_auth.authenticator import SAMLAuthenticator
 import unittest
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait

@@ -50,4 +50,8 @@ setup(name='jupyterhub_saml_auth',
       author='Wesley Uykimpang',
       url='https://github.com/ucsd-ets/jupyterhub-saml-auth',
       packages=find_packages(),
-      install_requires=['python3-saml'])
+      install_requires=[
+          'python3-saml',
+          'jupyterhub', 
+          'traitlets>=5.0.0', 
+          'notebook'])
