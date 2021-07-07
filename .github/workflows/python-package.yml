@@ -60,9 +60,9 @@ jobs:
     - name: Start docker containers
       run: |
         docker-compose up -d
-    - name: run automated tests
+    - name: run acceptance tests
       run: |
-        pytest test --browser chrome --headless
-        pytest test --browser firefox --headless
+        pytest test/test_acceptance.py --browser chrome --headless
+        pytest test/test_acceptance.py --browser firefox --headless
 
 
