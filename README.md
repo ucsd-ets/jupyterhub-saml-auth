@@ -4,6 +4,8 @@
 
 Authenticate your Jupyterhub users using SAML. This authenticator uses OneLogin's [python3-saml](https://github.com/onelogin/python3-saml) package as a backend API for handling SAML authentication.
 
+Once configured with Jupyterhub, you can login via SAML by navigating to `<HOST>:<PORT>/hub/saml_login`. If using the included `docker-compose.yml` configuration to run the application, the user registered in the test identity provider (IdP) is `user1` with password `user1pass`.
+
 ## Installation
 
 For now, install via pip and git
@@ -57,14 +59,13 @@ pip install -r requirements.txt
 
 # OPTIONAL, install package if developing source code
 pip install -e .
+pytest test/unit # run the unit tests
 
-# start the docker containers
-docker compose up -d
 ```
 
-### Test the authentication process
+#### Test the authentication process
 
-The application and IdP runs as docker containers and bind to ports: 8000, 8443, and 8080. You can navigate to `localhost:8000` in your browser to begin testing and to login via SAML, navigate to `localhost:8000/hub/saml_login`. The user registered in the IdP is `user1` with password `user1pass`.
+The acceptance test starts the application as a Docker container. Start the containers with `docker compose up -d` prior to running the acceptance test with the command `pytest test/test_acceptance.py`. See `conftest.py` for a list of command line switches/flags to run the acceptance tests.
 
 ### Kill your docker environment
 

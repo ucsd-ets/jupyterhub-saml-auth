@@ -20,7 +20,7 @@ def get_request(request):
         dataDict[key] = request.arguments[key][0].decode('utf-8')
 
     result = {
-        'https': 'on' if request == 'https' else 'off',
+        'https': 'on' if request.protocol == 'https' else 'off',
         'http_host': tornado.httputil.split_host_and_port(request.host)[0],
         'script_name': request.path,
         'server_port': tornado.httputil.split_host_and_port(request.host)[1],
