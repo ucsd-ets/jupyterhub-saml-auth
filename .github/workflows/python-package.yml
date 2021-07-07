@@ -39,6 +39,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install -e .
     - name: Install Google Chrome # Using shell script to install Google Chrome
       run: |
         wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -53,6 +54,9 @@ jobs:
         flake8 jupyterhub_saml_auth --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 jupyterhub_saml_auth --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Run the unit tests
+      run: |
+        pytest test/unit
     - name: Start docker containers
       run: |
         docker-compose up -d
