@@ -1,4 +1,5 @@
 from jupyterhub.auth import Authenticator
+from jupyterhub.utils import url_path_join
 from traitlets import Unicode, validate, Set, Callable
 import os
 
@@ -72,6 +73,9 @@ class SAMLAuthenticator(Authenticator):
                 raise FileNotFoundError(f'Could not locate {f} \
                     in saml settings path. Path = {path}, \
                     contents = {dir_contents}')
+
+    def login_url(self, base_url):
+        return url_path_join(base_url, 'saml_login')
 
     def authenticate(self, handler, data):
         return data['name']
