@@ -47,6 +47,14 @@ class SAMLAuthenticator(Authenticator):
         config=True
     )
 
+    login_service = Unicode(
+        os.environ.get('LOGIN_SERVICE', 'SSO'),
+        config=True,
+        help='''
+        Hosted domain string, e.g. your IdP
+        ''',
+    )
+
     @validate('saml_settings_path')
     def _valid_saml_settings_path(self, proposed):
         proposed_path = proposed['value']
