@@ -1,0 +1,17 @@
+.devcontainer/
+__pycache__
+*.pyc
+*.sqlite
+*.egg-info
+jupyterhub_cookie_secret
+bin/
+include/
+lib/
+*.key
+*.crt
+*.png
+share/
+*.log
+*.pid
+*.cfg
+dist/
