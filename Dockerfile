@@ -15,9 +15,5 @@ RUN apt-get update && \
                        libxml2-dev \
                        libxmlsec1-openssl
 
-# RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
-#     apt-get install nodejs && \
-#     npm install -g configurable-http-proxy
-
 RUN pip install --upgrade pip &&  \
     pip install -e .
