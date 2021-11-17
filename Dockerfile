@@ -1,4 +1,4 @@
-FROM python:3.8.5 
+FROM jupyterhub/jupyterhub:1.5.0 
 
 COPY . /app
 WORKDIR /app
@@ -12,9 +12,9 @@ RUN apt-get update && \
                        build-essential \
                        make
 
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
-    apt-get install nodejs && \
-    npm install -g configurable-http-proxy
+# RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+#     apt-get install nodejs && \
+#     npm install -g configurable-http-proxy
 
 RUN pip install --upgrade pip &&  \
     pip install -e .
