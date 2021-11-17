@@ -32,23 +32,19 @@ def driver(pytestconfig):
 
     driver.quit()
 
+def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
+    return WebDriverWait(driver, SECONDS_WAIT).until(
+        expected_conditions.element_to_be_clickable(
+            (selector, selector_value))
+    )
 
 def test_authentication(driver):
     driver.get('http://localhost:8000/hub/saml_login')
-    WebDriverWait(driver, SECONDS_WAIT).until(
-        expected_conditions.element_to_be_clickable(
-            (By.ID, 'username'))
-    ).send_keys('user1')
+    wait_for_element(driver, By.ID, 'username').send_keys('user1')
 
-    WebDriverWait(driver, SECONDS_WAIT).until(
-        expected_conditions.element_to_be_clickable(
-            (By.ID, 'password'))
-    ).send_keys('user1pass')
+    wait_for_element(driver, By.ID, 'password').send_keys('user1pass')
 
-    WebDriverWait(driver, SECONDS_WAIT).until(
-        expected_conditions.element_to_be_clickable(
-            (By.CSS_SELECTOR, '.btn'))
-    ).click()
+    wait_for_element(driver, By.CSS_SELECTOR, '.btn').click()
 
     # allow some time for server to spawn
     time.sleep(5)
@@ -66,9 +62,6 @@ def test_authentication(driver):
     assert cookies_names_to_check.issubset(current_cookies)
 
     # logout
-    WebDriverWait(driver, SECONDS_WAIT).until(
-        expected_conditions.element_to_be_clickable(
-            (By.ID, 'logout'))
-    ).click()
+    wait_for_element(driver, By.ID, 'logout').click()
 
     assert driver.get_cookies() == []

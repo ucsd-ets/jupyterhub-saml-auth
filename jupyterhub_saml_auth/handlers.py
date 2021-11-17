@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-def get_request(request):
+def format_request(request):
     dataDict = {}
     for key in request.arguments:
         dataDict[key] = request.arguments[key][0].decode('utf-8')
@@ -47,7 +47,7 @@ class BaseHandlerMixin:
 
     def _saml_settings_path_exists(self, path):
         # error checks
-        if not os.path.exists(path):
+        if not os.path.isdir(path):
             raise NotADirectoryError(f'Could not locate \
                 saml settings path at {path}')
 
@@ -66,7 +66,7 @@ class BaseHandlerMixin:
 class MetadataHandler(BaseHandler, BaseHandlerMixin):
 
     def get(self):
-        request = get_request(self.request)
+        request = format_request(self.request)
         auth = OneLogin_Saml2_Auth(
             request,
             custom_base_path=self.saml_settings_path
@@ -86,7 +86,7 @@ class MetadataHandler(BaseHandler, BaseHandlerMixin):
 class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
 
     async def get(self):
-        request = get_request(self.request)
+        request = format_request(self.request)
         auth = OneLogin_Saml2_Auth(
             request,
             custom_base_path=self.saml_settings_path
@@ -118,8 +118,12 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
 
 
 class ACSHandler(BaseHandler, BaseHandlerMixin):
+    """Assertion consumer service (ACS) handler.  This handler checks the data
+    received via a POST request from a SAML server within the SAML workflow. 
+    https://goteleport.com/blog/how-saml-authentication-works/
+    """
     async def post(self):
-        request = get_request(self.request)
+        request = format_request(self.request)
         auth = OneLogin_Saml2_Auth(
             request,
             custom_base_path=self.saml_settings_path
