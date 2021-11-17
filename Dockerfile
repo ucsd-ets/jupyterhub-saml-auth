@@ -10,7 +10,10 @@ RUN apt-get update && \
                        curl \
                        software-properties-common \
                        build-essential \
-                       make
+                       make \
+                       pkg-config \
+                       libxml2-dev \
+                       libxmlsec1-openssl
 
 # RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
 #     apt-get install nodejs && \
