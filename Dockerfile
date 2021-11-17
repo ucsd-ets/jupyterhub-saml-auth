@@ -13,7 +13,9 @@ RUN apt-get update && \
                        make \
                        pkg-config \
                        libxml2-dev \
-                       libxmlsec1-openssl
+                       libxmlsec1-openssl \
+                       gcc \
+                       python3-dev
 
 RUN pip install --upgrade pip &&  \
     pip install -e .
