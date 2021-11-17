@@ -1,5 +1,5 @@
 from tornado.httputil import HTTPServerRequest
-from jupyterhub_saml_auth.handlers import get_request
+from jupyterhub_saml_auth.handlers import format_request
 import pytest
 
 @pytest.fixture()
@@ -15,11 +15,11 @@ def mock_request():
 
     return mock_req
 
-def test_get_request_http(mock_request):
-    res = get_request(mock_request)
+def test_format_request_http(mock_request):
+    res = format_request(mock_request)
     assert res['https'] == 'off'
 
 def test_get_reqwuest_https(mock_request):
     mock_request.protocol = 'https'
-    res = get_request(mock_request)
+    res = format_request(mock_request)
     assert res['https'] == 'on'

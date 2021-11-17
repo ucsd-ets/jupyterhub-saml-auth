@@ -20,7 +20,7 @@ jobs:
 
     steps:
     - name: Install dependencies
-      run: |
+      run: |    
         sudo apt-get update && \
         sudo apt-get install -y xmlsec1 \
                         libxmlsec1-dev \
@@ -28,7 +28,10 @@ jobs:
                         curl \
                         software-properties-common \
                         build-essential \
-                        make
+                        make \
+                        python3-pip \
+                        python3-dev \
+                        wget
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -36,8 +39,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install python dependencies
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install flake8 pytest
+        python3 -m pip install --upgrade pip
+        python3 -m pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install -e .
     - name: Install Google Chrome # Using shell script to install Google Chrome
@@ -63,6 +66,5 @@ jobs:
     - name: run acceptance tests
       run: |
         pytest test/test_acceptance.py --browser chrome --headless
-        pytest test/test_acceptance.py --browser firefox --headless
 
 

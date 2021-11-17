@@ -10,11 +10,12 @@ RUN apt-get update && \
                        curl \
                        software-properties-common \
                        build-essential \
-                       make
-
-# RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
-#     apt-get install nodejs && \
-#     npm install -g configurable-http-proxy
+                       make \
+                       pkg-config \
+                       libxml2-dev \
+                       libxmlsec1-openssl \
+                       gcc \
+                       python3-dev
 
 RUN pip install --upgrade pip &&  \
     pip install -e .
