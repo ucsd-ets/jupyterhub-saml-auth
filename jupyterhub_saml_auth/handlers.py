@@ -19,7 +19,7 @@ def format_request(request):
     for key in request.arguments:
         dataDict[key] = request.arguments[key][0].decode('utf-8')
 
-    # the request may use https, however, request.protocol interpret it
+    # the request may use https, however, request.protocol may interpret it
     # as http. Have an environment variable to override this at
     # the app level in case this happens
     https = 'off'
