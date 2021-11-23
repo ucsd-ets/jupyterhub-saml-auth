@@ -37,6 +37,10 @@ c.SAMLAuthenticator.extract_username = extract_username
 c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.SAMLAuthenticator'
 ```
 
+### Environment variables
+
+- `SAML_HTTPS_OVERRIDE`: setting this will override the automatic detection of `http` or `https` to `/hub/acs` route and will set it to only `https`.
+
 ## Development
 
 ### Prerequisite software

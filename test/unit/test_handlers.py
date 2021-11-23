@@ -1,6 +1,8 @@
 from tornado.httputil import HTTPServerRequest
 from jupyterhub_saml_auth.handlers import format_request
 import pytest
+import os
+
 
 @pytest.fixture()
 def mock_request():
@@ -19,7 +21,12 @@ def test_format_request_http(mock_request):
     res = format_request(mock_request)
     assert res['https'] == 'off'
 
-def test_get_reqwuest_https(mock_request):
+def test_format_request_https(mock_request):
     mock_request.protocol = 'https'
+    res = format_request(mock_request)
+    assert res['https'] == 'on'
+
+def test_format_request_https_override(mock_request):
+    os.environ['SAML_HTTPS_OVERRIDE'] = 'true'
     res = format_request(mock_request)
     assert res['https'] == 'on'
