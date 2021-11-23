@@ -19,8 +19,15 @@ def format_request(request):
     for key in request.arguments:
         dataDict[key] = request.arguments[key][0].decode('utf-8')
 
+    # the request may use https, however, request.protocol interpret it
+    # as http. Have an environment variable to override this at
+    # the app level in case this happens
+    https = 'off'
+    if os.environ.get('SAML_HTTPS_OVERRIDE') or request.protocol == 'https':
+        https = 'on'
+
     result = {
-        'https': 'on' if request.protocol == 'https' else 'off',
+        'https': https,
         'http_host': tornado.httputil.split_host_and_port(request.host)[0],
         'script_name': request.path,
         'server_port': tornado.httputil.split_host_and_port(request.host)[1],
