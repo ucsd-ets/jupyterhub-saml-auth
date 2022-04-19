@@ -26,6 +26,13 @@ class SAMLAuthenticator(Authenticator):
         config=True
     )
 
+    persisting_cookie_names = Set(
+        help='''
+        Cookie names for managing SAML session that need to be present throughout login
+        ''',
+        config=True
+    )
+
     saml_settings_path = Unicode(
         default_value='/etc/saml',
         config=True,
@@ -94,6 +101,7 @@ class SAMLAuthenticator(Authenticator):
         self.acs_handler.saml_settings_path = self.saml_settings_path
         self.logout_handler.saml_settings = self.saml_settings_path
 
+        self.login_handler.persisting_cookie_names = self.persisting_cookie_names
         self.logout_handler.session_cookie_names = self.session_cookie_names
         self.acs_handler.extract_username = self.extract_username
 

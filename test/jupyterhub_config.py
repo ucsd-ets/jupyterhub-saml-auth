@@ -10,9 +10,11 @@ def extract_username(acs_handler, attributes):
 
 c.SAMLAuthenticator.saml_settings_path = '/app/etc'
 c.SAMLAuthenticator.session_cookie_names = {'PHPSESSIDIDP', 'SimpleSAMLAuthTokenIdp'}
+c.SAMLAuthenticator.persisting_cookie_names = {'datahub_deployment'}
 c.SAMLAuthenticator.extract_username = extract_username
 
 c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.SAMLAuthenticator'
+c.JupyterApp.log_level = 0
 
 
 def pre_spawn_hook(spawner):

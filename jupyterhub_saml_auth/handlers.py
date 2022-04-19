@@ -92,8 +92,31 @@ class MetadataHandler(BaseHandler, BaseHandlerMixin):
 
 class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
 
+    @property
+    def persisting_cookie_names(self):
+        try:
+            return self._persisting_cookie_names
+        except AttributeError:
+            return []
+
+    @persisting_cookie_names.setter
+    def persisting_cookie_names(self, cookies):
+        if not isinstance(cookies, set):
+            raise TypeError(f'persisting_cookie_names must \
+                be a set, not {type(cookies)}')
+        self._persisting_cookie_names = list(cookies)
+
     async def get(self):
+        
+        for cookie in self.persisting_cookie_names:
+            value = self.get_cookie(cookie, None)
+            app_log.info(f'{cookie}:{value}')
+            if value:
+                self._set_cookie(cookie, value, False)
+            
+
         request = format_request(self.request)
+        app_log.info(request)
         auth = OneLogin_Saml2_Auth(
             request,
             custom_base_path=self.saml_settings_path
@@ -101,6 +124,8 @@ class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
 
         return_to = f'{self.request.host}/acs'
         return self.redirect(auth.login(return_to))
+        
+        
 
 
 class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
