@@ -18,6 +18,7 @@ def format_request(request):
     dataDict = {}
     for key in request.arguments:
         dataDict[key] = request.arguments[key][0].decode('utf-8')
+        app_log.info(f'{key}:{dataDict[key]}')
 
     # the request may use https, however, request.protocol may interpret it
     # as http. Have an environment variable to override this at
@@ -106,26 +107,29 @@ class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
                 be a set, not {type(cookies)}')
         self._persisting_cookie_names = list(cookies)
 
-    async def get(self):
-        
+    def _transfer_persisting_cookies(self) -> None:
         for cookie in self.persisting_cookie_names:
             value = self.get_cookie(cookie, None)
             app_log.info(f'{cookie}:{value}')
-            if value:
-                self._set_cookie(cookie, value, False)
-            
+            self._set_cookie(cookie, "adfbadsf", False, domain='localhost')
+            # if value:
+            #     self._set_cookie(cookie, value, False)
+            # else:
+            #     self._set_cookie(cookie, "adfbadsf", False, domain='localhost:8080')
+
+    async def get(self):
+        
+        self._transfer_persisting_cookies()
 
         request = format_request(self.request)
-        app_log.info(request)
+        
         auth = OneLogin_Saml2_Auth(
             request,
             custom_base_path=self.saml_settings_path
         )
 
         return_to = f'{self.request.host}/acs'
-        return self.redirect(auth.login(return_to))
-        
-        
+        return self.redirect(auth.login(return_to))      
 
 
 class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
