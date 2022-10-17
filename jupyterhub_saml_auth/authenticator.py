@@ -5,15 +5,17 @@ import os
 
 from .handlers import (
     ACSHandler,
+    SLSHandler,
     MetadataHandler,
     SamlLoginHandler,
-    SamlLogoutHandler,
+    SamlLogoutHandler
 )
 
 
 class SAMLAuthenticator(Authenticator):
 
     acs_handler = ACSHandler
+    sls_handler = SLSHandler
     metadata_handler = MetadataHandler
     login_handler = SamlLoginHandler
     logout_handler = SamlLogoutHandler
@@ -92,9 +94,8 @@ class SAMLAuthenticator(Authenticator):
         self.login_handler.saml_settings_path = self.saml_settings_path
         self.metadata_handler.saml_settings_path = self.saml_settings_path
         self.acs_handler.saml_settings_path = self.saml_settings_path
-        self.logout_handler.saml_settings = self.saml_settings_path
-
-        self.logout_handler.session_cookie_names = self.session_cookie_names
+        self.logout_handler.saml_settings_path = self.saml_settings_path
+        self.sls_handler.saml_settings_path = self.saml_settings_path
         self.acs_handler.extract_username = self.extract_username
 
     def get_handlers(self, app):
@@ -104,5 +105,6 @@ class SAMLAuthenticator(Authenticator):
             (r'/saml_login', self.login_handler),
             (r'/metadata', self.metadata_handler),
             (r'/acs', self.acs_handler),
-            (r'/logout', self.logout_handler)
+            (r'/logout', self.logout_handler),
+            (r'/sls', self.sls_handler)
         ]

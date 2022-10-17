@@ -4,13 +4,14 @@ import tornado
 from tornado.log import app_log
 import tornado.web
 import os
-
+import logging
 
 __all__ = [
     'MetadataHandler',
     'SamlLoginHandler',
     'SamlLogoutHandler',
-    'ACSHandler'
+    'ACSHandler',
+    'SLSHandler'
 ]
 
 
@@ -93,6 +94,7 @@ class MetadataHandler(BaseHandler, BaseHandlerMixin):
 class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
 
     async def get(self):
+        logging.warn("login handler")
         request = format_request(self.request)
         auth = OneLogin_Saml2_Auth(
             request,
@@ -104,24 +106,21 @@ class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
 
 
 class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
-
-    @property
-    def session_cookie_names(self):
-        try:
-            return self._session_cookie_names
-        except AttributeError:
-            return []
-
-    @session_cookie_names.setter
-    def session_cookie_names(self, cookies):
-        if not isinstance(cookies, set):
-            raise TypeError(f'session_cookie_names must \
-                be a set, not {type(cookies)}')
-        self._session_cookie_names = list(cookies)
-
     async def handle_logout(self):
-        for cookie in self.session_cookie_names:
-            self.clear_cookie(cookie)
+        request = format_request(self.request)
+        auth = OneLogin_Saml2_Auth(
+            request,
+            custom_base_path=self.saml_settings_path
+        )
+        delete_session_callback = lambda: self.request.clear()
+        url = auth.process_slo(delete_session_cb=delete_session_callback)
+        errors = auth.get_errors()
+        if len(errors) == 0:
+            if url is not None:
+                return self.redirect(url)
+        else:
+            app_log.error(("Error when processing SLO: %s %s" % (', '.join(errors), auth.get_last_error_reason())))
+            raise tornado.web.HTTPError(500)
 
 
 class ACSHandler(BaseHandler, BaseHandlerMixin):
@@ -157,3 +156,25 @@ class ACSHandler(BaseHandler, BaseHandlerMixin):
 
             raise tornado.web.HTTPError(403)
         self.redirect(self.get_next_url(user))
+
+
+class SLSHandler(BaseHandler, BaseHandlerMixin):
+    """Single logout service (SLS) handler.  This handler logs out a session
+    when it recieves a POST request to logout.
+    """
+    async def post(self):
+        # request = format_request(self.request)
+        # auth = OneLogin_Saml2_Auth(
+        #     request,
+        #     custom_base_path=self.saml_settings_path
+        # )
+        # delete_session_callback = lambda: self.request.clear()
+        # url = auth.process_slo(delete_session_cb=delete_session_callback)
+        # errors = auth.get_errors()
+        # if len(errors) == 0:
+        #     if url is not None:
+        #         return self.redirect(url)
+        # else:
+        #     app_log.error(("Error when processing SLO: %s %s" % (', '.join(errors), auth.get_last_error_reason())))
+        #     raise tornado.web.HTTPError(500)
+        pass

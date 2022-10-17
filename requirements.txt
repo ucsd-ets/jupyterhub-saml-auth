@@ -1,3 +1,5 @@
 pytest
 selenium
 flake8
+jupyterhub
+python3-saml
