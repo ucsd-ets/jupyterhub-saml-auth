@@ -14,6 +14,11 @@ __all__ = [
     'SLSHandler'
 ]
 
+logging.basicConfig(filename="log.txt",
+                    filemode='a',
+                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%H:%M:%S',
+                    level=logging.DEBUG)
 
 def format_request(request):
     dataDict = {}
@@ -94,7 +99,6 @@ class MetadataHandler(BaseHandler, BaseHandlerMixin):
 class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
 
     async def get(self):
-        logging.warn("login handler")
         request = format_request(self.request)
         auth = OneLogin_Saml2_Auth(
             request,
@@ -107,13 +111,20 @@ class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
 
 class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
     async def handle_logout(self):
+        logging.info("logout handler")
         request = format_request(self.request)
         auth = OneLogin_Saml2_Auth(
             request,
             custom_base_path=self.saml_settings_path
         )
+        logging.info(request)
         delete_session_callback = lambda: self.request.clear()
-        url = auth.process_slo(delete_session_cb=delete_session_callback)
+        logging.info("cleared request")
+        try:
+            url = auth.process_slo(delete_session_cb=delete_session_callback)
+        except Exception as e:
+            logging.error(str(e))
+        logging.info("processed SLO")
         errors = auth.get_errors()
         if len(errors) == 0:
             if url is not None:
