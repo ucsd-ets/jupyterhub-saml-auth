@@ -111,20 +111,13 @@ class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
 
 class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
     async def handle_logout(self):
-        logging.info("logout handler")
         request = format_request(self.request)
         auth = OneLogin_Saml2_Auth(
             request,
             custom_base_path=self.saml_settings_path
         )
-        logging.info(request)
         delete_session_callback = lambda: self.request.clear()
-        logging.info("cleared request")
-        try:
-            url = auth.process_slo(delete_session_cb=delete_session_callback)
-        except Exception as e:
-            logging.error(str(e))
-        logging.info("processed SLO")
+        url = auth.process_slo(delete_session_cb=delete_session_callback)
         errors = auth.get_errors()
         if len(errors) == 0:
             if url is not None:
