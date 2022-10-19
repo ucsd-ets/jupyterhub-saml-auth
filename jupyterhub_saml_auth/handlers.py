@@ -5,20 +5,18 @@ from tornado.log import app_log
 import tornado.web
 import os
 import logging
+from .cache import InMemoryCache, SessionEntry
 
 __all__ = [
     'MetadataHandler',
     'SamlLoginHandler',
     'SamlLogoutHandler',
-    'ACSHandler',
-    'SLSHandler'
+    'ACSHandler'
 ]
 
-logging.basicConfig(filename="log.txt",
-                    filemode='a',
-                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                    datefmt='%H:%M:%S',
-                    level=logging.DEBUG)
+# FIXME abstract this out
+cache = InMemoryCache()
+
 
 def format_request(request):
     dataDict = {}
@@ -97,7 +95,6 @@ class MetadataHandler(BaseHandler, BaseHandlerMixin):
 
 
 class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
-
     async def get(self):
         request = format_request(self.request)
         auth = OneLogin_Saml2_Auth(
@@ -110,21 +107,64 @@ class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
 
 
 class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
-    async def handle_logout(self):
+
+    @property
+    def session_cookie_names(self) -> set:
+        try:
+            return self._session_cookie_names
+        except AttributeError:
+            return {}
+
+    @session_cookie_names.setter
+    def session_cookie_names(self, cookies):
+        if not isinstance(cookies, set):
+            raise TypeError(f'session_cookie_names must \
+                be a set, not {type(cookies)}')
+        self._session_cookie_names = list(cookies)
+
+    @property
+    def return_to(self) -> str:
+        try:
+            return self._return_to
+        except AttributeError:
+            return None
+
+    @return_to.setter
+    def return_to(self, return_to: str):
+        if not isinstance(return_to, str):
+            raise AttributeError(
+                f"return_to must be an str, not = {type(return_to)}")
+
+        self._return_to = return_to
+
+    async def default_handle_logout(self):
+        """The default logout action
+        Optionally cleans up servers, clears cookies, increments logout counter
+        Cleaning up servers can be prevented by setting shutdown_on_logout to
+        False.
+        """
+        user = self.current_user
+        username = user.name
+        if user:
+            if self.shutdown_on_logout:
+                await self._shutdown_servers(user)
+
+            self._backend_logout_cleanup(user.name)
+            await self.slo_logout(username)
+
+    async def slo_logout(self, username: str):
+        for cookie in self.session_cookie_names:
+            self.clear_cookie(cookie)
+
         request = format_request(self.request)
         auth = OneLogin_Saml2_Auth(
             request,
             custom_base_path=self.saml_settings_path
         )
-        delete_session_callback = lambda: self.request.clear()
-        url = auth.process_slo(delete_session_cb=delete_session_callback)
-        errors = auth.get_errors()
-        if len(errors) == 0:
-            if url is not None:
-                return self.redirect(url)
-        else:
-            app_log.error(("Error when processing SLO: %s %s" % (', '.join(errors), auth.get_last_error_reason())))
-            raise tornado.web.HTTPError(500)
+
+        user_entry = cache.get(username)
+        cache.remove(username)
+        return self.redirect(auth.logout(name_id=user_entry.name_id, session_index=user_entry.session_index))
 
 
 class ACSHandler(BaseHandler, BaseHandlerMixin):
@@ -140,6 +180,7 @@ class ACSHandler(BaseHandler, BaseHandlerMixin):
         )
 
         auth.process_response()
+
         errors = auth.get_errors()
 
         if len(errors) != 0:
@@ -153,6 +194,15 @@ class ACSHandler(BaseHandler, BaseHandlerMixin):
         user_data = auth.get_attributes()
         username = self.extract_username(user_data)
 
+        # add the user to the cache
+        session_entry = SessionEntry(
+            name_id=auth.get_nameid(),
+            saml_attrs=auth.get_attributes(),
+            session_index=auth.get_session_index()
+        )
+
+        cache.upsert(username, session_entry)
+
         user = await self.login_user({'name': username})
         if user is None:
             app_log.error(f'Could not log in user via jupyterhub. \
@@ -160,25 +210,3 @@ class ACSHandler(BaseHandler, BaseHandlerMixin):
 
             raise tornado.web.HTTPError(403)
         self.redirect(self.get_next_url(user))
-
-
-class SLSHandler(BaseHandler, BaseHandlerMixin):
-    """Single logout service (SLS) handler.  This handler logs out a session
-    when it recieves a POST request to logout.
-    """
-    async def post(self):
-        # request = format_request(self.request)
-        # auth = OneLogin_Saml2_Auth(
-        #     request,
-        #     custom_base_path=self.saml_settings_path
-        # )
-        # delete_session_callback = lambda: self.request.clear()
-        # url = auth.process_slo(delete_session_cb=delete_session_callback)
-        # errors = auth.get_errors()
-        # if len(errors) == 0:
-        #     if url is not None:
-        #         return self.redirect(url)
-        # else:
-        #     app_log.error(("Error when processing SLO: %s %s" % (', '.join(errors), auth.get_last_error_reason())))
-        #     raise tornado.web.HTTPError(500)
-        pass

@@ -1,4 +1,4 @@
-FROM jupyterhub/jupyterhub:1.5.0 
+FROM jupyterhub/jupyterhub:3
 
 COPY . /app
 WORKDIR /app

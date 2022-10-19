@@ -8,7 +8,7 @@ services:
     environment:
     - SIMPLESAMLPHP_SP_ENTITY_ID=http://localhost:8000/hub/metadata/
     - SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE=http://localhost:8000/hub/acs
-    - SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE=http://localhost:8000/hub/logout
+    - SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE=http://localhost:8000
   jupyterhub:
     build: .
     ports:
