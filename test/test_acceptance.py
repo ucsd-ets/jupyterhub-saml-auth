@@ -49,10 +49,9 @@ def test_authentication(driver):
     # allow some time for server to spawn
     time.sleep(5)
 
-    assert driver.current_url == 'http://localhost:8000/user/user1/tree?'
+    assert driver.current_url == 'http://localhost:8000/user/user1/tree/?'
 
     cookies_names_to_check = {
-        'PHPSESSIDIDP',
         'SimpleSAMLAuthTokenIdp',
         'jupyterhub-session-id'
     }
@@ -64,4 +63,6 @@ def test_authentication(driver):
     # logout
     wait_for_element(driver, By.ID, 'logout').click()
 
-    assert driver.get_cookies() == []
+    cookies = driver.get_cookies()
+    for cookie in cookies:
+        assert cookie['name'] not in cookies_names_to_check, cookie['name']
