@@ -52,8 +52,8 @@ class TestDisabledCache:
 
 
 def test_create():
-    assert isinstance(create('in-memory'), InMemoryCache)
-    assert isinstance(create('disabled'), DisabledCache)
+    for cache_name, cache_cls in cache_map.items():
+        assert isinstance(create(cache_name), cache_cls)
 
     with pytest.raises(CacheError):
         create('unspecified')
