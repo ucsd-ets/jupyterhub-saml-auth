@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod
 
 __session_cache = None
 
+
 class CacheError(Exception):
     pass
 
@@ -11,7 +12,7 @@ class CacheError(Exception):
 @dataclass
 class SessionEntry:
     """
-    
+
     """
     name_id: str = None
     saml_attrs: dict = None
@@ -114,15 +115,21 @@ def create(cache_type: str) -> Cache:
 
 
 def register(cache: Cache):
+    """Singleton function for registering a cache"""
     if not isinstance(cache, Cache):
-        raise AttributeError(f'You must specify a Cache object, not = {type(cache)}')
-    
+        raise AttributeError(
+            f'You must specify a Cache object, not = {type(cache)}')
+
     global __session_cache
     __session_cache = cache
 
+
 def get():
+    """Singleton method for getting a registered cache. You must register a cache before calling
+    this function"""
     global __session_cache
     if not __session_cache:
-        raise CacheError("you must register a cache first with register(cache)")
-    
+        raise CacheError(
+            "you must register a cache first with register(cache)")
+
     return __session_cache
