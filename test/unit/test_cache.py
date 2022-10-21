@@ -53,7 +53,7 @@ class TestDisabledCache:
 
 def test_create():
     for cache_name, cache_cls in cache_map.items():
-        assert isinstance(create(cache_name), cache_cls)
+        assert isinstance(create(cache_name), cache_cls), cache_name
 
     with pytest.raises(CacheError):
         create('unspecified')
