@@ -1,14 +1,16 @@
 from jupyterhub.auth import Authenticator
 from jupyterhub.utils import url_path_join
-from traitlets import Unicode, validate, Set, Callable
+from traitlets import Unicode, validate, Set, Callable, Dict
 import os
 
 from .handlers import (
     ACSHandler,
     MetadataHandler,
     SamlLoginHandler,
-    SamlLogoutHandler
+    SamlLogoutHandler,
+    session_cache
 )
+from . import cache
 
 
 class SAMLAuthenticator(Authenticator):
@@ -36,6 +38,40 @@ class SAMLAuthenticator(Authenticator):
         '''
     )
 
+    cache_spec = Dict(
+        {
+            'disabled': True,
+            'type': 'disabled',
+            'client': None
+        },
+        config=True,
+        help='''
+        Specifications for the session cache. Defaults to disabled.
+
+        Allowed values for type = {'in-memory', 'disabled', 'redis'}
+        '''
+    )
+
+    logout_kwargs = Dict(
+        {},
+        config=True,
+        help='''
+        Extra keyword arguments you can pass to OneLogin's auth class' "logout" method
+
+        If a live cache is specified in cache_spec (e.g. like an in-memory cache), then
+        arguments: "name_id" and "session_index" are automatically filled in. Other arguments,
+        like return_to, nq, etc. must be provided in a dict here
+        
+        Example:
+        {
+            "return_to": "myurl.com/login"
+        }
+
+        See https://github.com/onelogin/python3-saml/blob/ba572e24fd3028c0e38c8f9dcd02af46ddcc0870/src/onelogin/saml2/auth.py#L438
+        for a full list of all keyword arguments
+        '''
+    )
+
     extract_username = Callable(
         help='''
         Extract the username from the attributes returned by the IdP.
@@ -47,12 +83,19 @@ class SAMLAuthenticator(Authenticator):
         config=True
     )
 
+    set_session = Callable(
+        help='''
+        Structure the session object upon login.
+        ''',
+        config=True
+    )
+
     login_service = Unicode(
         os.environ.get('LOGIN_SERVICE', 'SSO'),
         config=True,
         help='''
         Hosted domain string, e.g. your IdP
-        ''',
+        '''
     )
 
     @validate('saml_settings_path')
@@ -88,16 +131,34 @@ class SAMLAuthenticator(Authenticator):
     def authenticate(self, handler, data):
         return data['name']
 
-    def configure_handlers(self):
+    def _configure_handlers(self):
         self.login_handler.saml_settings_path = self.saml_settings_path
+        
         self.metadata_handler.saml_settings_path = self.saml_settings_path
+        
         self.acs_handler.saml_settings_path = self.saml_settings_path
-        self.logout_handler.saml_settings_path = self.saml_settings_path
-        self.logout_handler.session_cookie_names = self.session_cookie_names
         self.acs_handler.extract_username = self.extract_username
 
+        self.logout_handler.saml_settings_path = self.saml_settings_path
+        self.logout_handler.logout_kwargs = self.logout_kwargs
+        self.logout_handler.session_cookie_names = self.session_cookie_names
+        
+
+    def _setup_cache(self):
+        try:
+            # test that the cache has been registered
+            cache.get()
+        except cache.CacheError:
+            # if not create it
+            if self.cache_spec['disabled']:
+                self.cache_spec['type'] = 'disabled'
+
+            created_cache = cache.create(self.cache_spec['type'])
+            cache.register(created_cache)
+
     def get_handlers(self, app):
-        self.configure_handlers()
+        self._setup_cache()
+        self._configure_handlers()
 
         return [
             (r'/saml_login', self.login_handler),

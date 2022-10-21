@@ -5,7 +5,7 @@ from tornado.log import app_log
 import tornado.web
 import os
 import logging
-from .cache import InMemoryCache, SessionEntry
+from . import cache
 
 __all__ = [
     'MetadataHandler',
@@ -14,8 +14,7 @@ __all__ = [
     'ACSHandler'
 ]
 
-# FIXME abstract this out
-cache = InMemoryCache()
+session_cache = None
 
 
 def format_request(request):
@@ -107,6 +106,13 @@ class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
 
 
 class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
+    @property
+    def logout_kwargs(self):
+        return self._logout_kwargs
+
+    @logout_kwargs.setter
+    def logout_kwargs(self, logout_kwargs: dict):
+        self._logout_kwargs = logout_kwargs
 
     @property
     def session_cookie_names(self) -> set:
@@ -121,21 +127,6 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
             raise TypeError(f'session_cookie_names must \
                 be a set, not {type(cookies)}')
         self._session_cookie_names = list(cookies)
-
-    @property
-    def return_to(self) -> str:
-        try:
-            return self._return_to
-        except AttributeError:
-            return None
-
-    @return_to.setter
-    def return_to(self, return_to: str):
-        if not isinstance(return_to, str):
-            raise AttributeError(
-                f"return_to must be an str, not = {type(return_to)}")
-
-        self._return_to = return_to
 
     async def default_handle_logout(self):
         """The default logout action
@@ -161,10 +152,10 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
             request,
             custom_base_path=self.saml_settings_path
         )
-
-        user_entry = cache.get(username)
-        cache.remove(username)
-        return self.redirect(auth.logout(name_id=user_entry.name_id, session_index=user_entry.session_index))
+        session_cache = cache.get()
+        user_entry = session_cache.get(username)
+        session_cache.remove(username)
+        return self.redirect(auth.logout(name_id=user_entry.name_id, session_index=user_entry.session_index, **self.logout_kwargs))
 
 
 class ACSHandler(BaseHandler, BaseHandlerMixin):
@@ -195,13 +186,15 @@ class ACSHandler(BaseHandler, BaseHandlerMixin):
         username = self.extract_username(user_data)
 
         # add the user to the cache
-        session_entry = SessionEntry(
+        session_entry = cache.SessionEntry(
             name_id=auth.get_nameid(),
             saml_attrs=auth.get_attributes(),
             session_index=auth.get_session_index()
         )
 
-        cache.upsert(username, session_entry)
+        session_cache = cache.get()
+
+        session_cache.upsert(username, session_entry)
 
         user = await self.login_user({'name': username})
         if user is None:
