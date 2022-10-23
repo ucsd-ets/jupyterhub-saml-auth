@@ -41,6 +41,25 @@ c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.SAMLAuthenticator'
 
 - `SAML_HTTPS_OVERRIDE`: setting this will override the automatic detection of `http` or `https` to `/hub/acs` route and will set it to only `https`.
 
+### Redis Configuration in Docker Compose
+
+Development
+```yaml
+redis:
+    image: redis/redis-stack:latest
+    ports:
+    - "6379:6379"
+    - "8001:8001"
+```
+
+Production
+```yaml
+redis:
+    image: redis/redis-stack-server:latest
+    ports:
+    - "6379:6379"
+```
+
 ## Development
 
 ### Prerequisite software
