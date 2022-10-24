@@ -2,11 +2,12 @@ import pytest
 from unittest.mock import MagicMock
 from jupyterhub_saml_auth.cache import *
 
-test_username = 'user1'
-test_session_entry = SessionEntry(name_id='mynameid', saml_attrs={
-    'attr1': 'attr1_val',
-    'attr2': 'attr2_val'
-}, session_index='sessionindex')
+test_username = "user1"
+test_session_entry = SessionEntry(
+    name_id="mynameid",
+    saml_attrs={"attr1": "attr1_val", "attr2": "attr2_val"},
+    session_index="sessionindex",
+)
 
 
 class TestInMemoryCache:
@@ -23,14 +24,14 @@ class TestInMemoryCache:
         got = in_memory_cache.get(test_username)
         assert got == test_session_entry
 
-        got = in_memory_cache.get('doesntexist')
+        got = in_memory_cache.get("doesntexist")
         assert got == SessionEntry()
 
     def test_remove(self, in_memory_cache):
         in_memory_cache.remove(test_username)
         assert not in_memory_cache._cache
 
-        in_memory_cache.remove('none')
+        in_memory_cache.remove("none")
 
 
 class TestDisabledCache:
@@ -40,7 +41,7 @@ class TestDisabledCache:
 
     def test_get(self, disabled_cache):
         should_be = SessionEntry()
-        assert disabled_cache.get('something') == should_be
+        assert disabled_cache.get("something") == should_be
 
     def test_upsert(self, disabled_cache):
         disabled_cache.upsert(test_username, test_session_entry)
@@ -51,23 +52,18 @@ class TestDisabledCache:
     def test_remove(self, disabled_cache):
         disabled_cache.remove(test_username)
 
+
 @pytest.fixture
 def cache_details():
     cache_details = []
     for cache_type, cache_cls in cache_map.items():
-        cache_spec = {
-            'type': cache_type
-        }
+        cache_spec = {"type": cache_type}
         if cache_cls.client_required:
-            cache_spec.update({
-                'client': MagicMock(),
-                'client_kwargs': {}
-            })
-        cache_details.append(
-            (cache_type, cache_cls, cache_spec)
-        )
-        
+            cache_spec.update({"client": MagicMock(), "client_kwargs": {}})
+        cache_details.append((cache_type, cache_cls, cache_spec))
+
     return cache_details
+
 
 def test_create(cache_details):
 
@@ -76,9 +72,7 @@ def test_create(cache_details):
         assert isinstance(created_cache, cache_cls), cache_type
 
     with pytest.raises(CacheError):
-        create({
-            'type': 'unspecified'
-        })
+        create({"type": "unspecified"})
 
 
 def test_get_fail():

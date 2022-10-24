@@ -139,7 +139,7 @@ def create(cache_spec: dict) -> Cache:
         Cache: an instance of a cache
     """
     # check cache_spec keys
-    if 'type' not in cache_spec:
+    if "type" not in cache_spec:
         raise AttributeError(f"you must specify key = 'type' in cache_spec")
 
     # check cache type
@@ -157,7 +157,7 @@ def create(cache_spec: dict) -> Cache:
                 f"specify either client or client_kwargs in cache_spec. Its required for type = {cache_type}"
             )
         return cache_map[cache_type](cache_spec["client"], cache_spec["client_kwargs"])
-    
+
     return cache_map[cache_type]()
 
 
