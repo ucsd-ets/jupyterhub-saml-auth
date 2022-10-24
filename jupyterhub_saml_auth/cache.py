@@ -88,6 +88,7 @@ class RedisCache(Cache):
     Args:
         client: The Redis client.
     """
+
     def __init__(self, client: Redis, client_args: dict[str, Any]):
         self.client = client(**client_args)
 

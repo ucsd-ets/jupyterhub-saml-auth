@@ -22,7 +22,7 @@ redis_client_args = {
     "host": REDIS_HOST,
     "port": REDIS_PORT,
     "password": REDIS_PASSWORD,
-    "decode_responses": True
+    "decode_responses": True,
 }
 
 
@@ -35,7 +35,12 @@ def extract_username(acs_handler, attributes):
 c.SAMLAuthenticator.saml_settings_path = "/app/etc"
 c.SAMLAuthenticator.session_cookie_names = {"PHPSESSIDIDP", "SimpleSAMLAuthTokenIdp"}
 c.SAMLAuthenticator.extract_username = extract_username
-c.SAMLAuthenticator.cache_spec = {"disabled": False, "type": "redis", "client": redis_client, "client_args": redis_client_args}
+c.SAMLAuthenticator.cache_spec = {
+    "disabled": False,
+    "type": "redis",
+    "client": redis_client,
+    "client_args": redis_client_args,
+}
 
 c.JupyterHub.authenticator_class = "jupyterhub_saml_auth.SAMLAuthenticator"
 

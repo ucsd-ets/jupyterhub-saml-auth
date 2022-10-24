@@ -8,7 +8,7 @@ from .handlers import (
     MetadataHandler,
     SamlLoginHandler,
     SamlLogoutHandler,
-    session_cache
+    session_cache,
 )
 from . import cache
 
@@ -21,42 +21,37 @@ class SAMLAuthenticator(Authenticator):
     logout_handler = SamlLogoutHandler
 
     session_cookie_names = Set(
-        help='''
+        help="""
         Cookie names for managing SAML session that would be cleared upon
         logout
-        ''',
-        config=True
+        """,
+        config=True,
     )
 
     saml_settings_path = Unicode(
-        default_value='/etc/saml',
+        default_value="/etc/saml",
         config=True,
-        help='''
+        help="""
         A filepath to the location of saml settings required for python3-saml.
         Contents of this directory should include settings.json,
         advanced_settings.json, and a cert/ directory if applicable
-        '''
+        """,
     )
 
     cache_spec = Dict(
-        {
-            'disabled': True,
-            'type': 'disabled',
-            'client': None,
-            'client_args': None
-        },
+        {"disabled": True, "type": "disabled", "client": None, "client_args": None},
         config=True,
-        help='''
+        help="""
         Specifications for the session cache. Defaults to disabled.
 
         Allowed values for type = {'in-memory', 'disabled', 'redis'}
-        '''
+        """,
     )
 
     logout_kwargs = Dict(
         {},
         config=True,
-        help='''
+        help="""
         Extra keyword arguments you can pass to OneLogin's auth class' "logout" method
 
         If a live cache is specified in cache_spec (e.g. like an in-memory cache), then
@@ -70,38 +65,38 @@ class SAMLAuthenticator(Authenticator):
 
         See https://github.com/onelogin/python3-saml/blob/ba572e24fd3028c0e38c8f9dcd02af46ddcc0870/src/onelogin/saml2/auth.py#L438
         for a full list of all keyword arguments
-        '''
+        """,
     )
 
     extract_username = Callable(
-        help='''
+        help="""
         Extract the username from the attributes returned by the IdP.
 
         1. the ACSHandler instance if needed
         2. Takes in a dict with the attributes, must return a
         username as a string
-        ''',
-        config=True
+        """,
+        config=True,
     )
 
     set_session = Callable(
-        help='''
+        help="""
         Structure the session object upon login.
-        ''',
-        config=True
+        """,
+        config=True,
     )
 
     login_service = Unicode(
-        os.environ.get('LOGIN_SERVICE', 'SSO'),
+        os.environ.get("LOGIN_SERVICE", "SSO"),
         config=True,
-        help='''
+        help="""
         Hosted domain string, e.g. your IdP
-        '''
+        """,
     )
 
-    @validate('saml_settings_path')
+    @validate("saml_settings_path")
     def _valid_saml_settings_path(self, proposed):
-        proposed_path = proposed['value']
+        proposed_path = proposed["value"]
 
         # error check
         self._saml_settings_path_exists(proposed_path)
@@ -112,38 +107,41 @@ class SAMLAuthenticator(Authenticator):
     def _saml_settings_path_exists(self, path):
         # error checks
         if not os.path.exists(path):
-            raise NotADirectoryError(f'Could not locate saml \
-                settings path at {path}')
+            raise NotADirectoryError(
+                f"Could not locate saml \
+                settings path at {path}"
+            )
 
     def _settings_files_exist(self, path):
         dir_contents = os.listdir(path)
 
-        files_to_check = ['settings.json', 'advanced_settings.json']
+        files_to_check = ["settings.json", "advanced_settings.json"]
 
         for f in files_to_check:
             if f not in dir_contents:
-                raise FileNotFoundError(f'Could not locate {f} \
+                raise FileNotFoundError(
+                    f"Could not locate {f} \
                     in saml settings path. Path = {path}, \
-                    contents = {dir_contents}')
+                    contents = {dir_contents}"
+                )
 
     def login_url(self, base_url):
-        return url_path_join(base_url, 'saml_login')
+        return url_path_join(base_url, "saml_login")
 
     def authenticate(self, handler, data):
-        return data['name']
+        return data["name"]
 
     def _configure_handlers(self):
         self.login_handler.saml_settings_path = self.saml_settings_path
-        
+
         self.metadata_handler.saml_settings_path = self.saml_settings_path
-        
+
         self.acs_handler.saml_settings_path = self.saml_settings_path
         self.acs_handler.extract_username = self.extract_username
 
         self.logout_handler.saml_settings_path = self.saml_settings_path
         self.logout_handler.logout_kwargs = self.logout_kwargs
         self.logout_handler.session_cookie_names = self.session_cookie_names
-        
 
     def _setup_cache(self):
         try:
@@ -151,13 +149,19 @@ class SAMLAuthenticator(Authenticator):
             cache.get()
         except cache.CacheError:
             # if not create it
-            if self.cache_spec['disabled']:
-                self.cache_spec['type'] = 'disabled'
+            if self.cache_spec["disabled"]:
+                self.cache_spec["type"] = "disabled"
 
-            if self.cache_spec['client'] and self.cache_spec['client_args'] is not None:
-                created_cache = cache.create(self.cache_spec['type'], self.cache_spec['client'], self.cache_spec['client_args'])
-            elif self.cache_spec['client'] is not None:
-                created_cache = cache.create(self.cache_spec['type'], self.cache_spec['client'])
+            if self.cache_spec["client"] and self.cache_spec["client_args"] is not None:
+                created_cache = cache.create(
+                    self.cache_spec["type"],
+                    self.cache_spec["client"],
+                    self.cache_spec["client_args"],
+                )
+            elif self.cache_spec["client"] is not None:
+                created_cache = cache.create(
+                    self.cache_spec["type"], self.cache_spec["client"]
+                )
 
             cache.register(created_cache)
 
@@ -166,8 +170,8 @@ class SAMLAuthenticator(Authenticator):
         self._configure_handlers()
 
         return [
-            (r'/saml_login', self.login_handler),
-            (r'/metadata', self.metadata_handler),
-            (r'/acs', self.acs_handler),
-            (r'/logout', self.logout_handler)
+            (r"/saml_login", self.login_handler),
+            (r"/metadata", self.metadata_handler),
+            (r"/acs", self.acs_handler),
+            (r"/logout", self.logout_handler),
         ]
