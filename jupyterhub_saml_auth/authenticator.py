@@ -1,6 +1,6 @@
 from jupyterhub.auth import Authenticator
 from jupyterhub.utils import url_path_join
-from traitlets import Unicode, validate, Set, Callable, Dict
+from traitlets import Unicode, validate, Set, Callable, Dict, Bool
 import os
 
 from .handlers import (
@@ -46,6 +46,15 @@ class SAMLAuthenticator(Authenticator):
 
         Allowed values for type = {'in-memory', 'disabled', 'redis'}
         """,
+    )
+
+    idp_logout = Bool(
+        True,
+        config=True,
+        help='''
+        If set to true, upon logout, will redirect to the IdP single sign out URL. If not,
+        it'll juset clear the cookies defined in "session_cookies".
+        '''
     )
 
     logout_kwargs = Dict(
@@ -141,6 +150,7 @@ class SAMLAuthenticator(Authenticator):
 
         self.logout_handler.saml_settings_path = self.saml_settings_path
         self.logout_handler.logout_kwargs = self.logout_kwargs
+        self.logout_handler.idp_logout = self.idp_logout
         self.logout_handler.session_cookie_names = self.session_cookie_names
 
     def _setup_cache(self):

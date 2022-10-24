@@ -72,6 +72,15 @@ class BaseHandlerMixin:
                     settings path. Path = {path}, contents \
                     = {dir_contents}')
 
+    @property
+    def auth(self) -> OneLogin_Saml2_Auth:
+        request = format_request(self.request)
+        onelogin_auth = OneLogin_Saml2_Auth(
+            request,
+            custom_base_path=self.saml_settings_path
+        )
+        return onelogin_auth
+
 
 class MetadataHandler(BaseHandler, BaseHandlerMixin):
 
@@ -100,7 +109,6 @@ class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
             request,
             custom_base_path=self.saml_settings_path
         )
-
         return_to = f'{self.request.host}/acs'
         return self.redirect(auth.login(return_to))
 
@@ -128,6 +136,17 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
                 be a set, not {type(cookies)}')
         self._session_cookie_names = list(cookies)
 
+    @property
+    def idp_logout(self):
+        return self._idp_logout
+
+    @idp_logout.setter
+    def idp_logout(self, idp_logout: bool):
+        if not isinstance(idp_logout, bool):
+            raise AttributeError('idp_logout must be an instance of a bool')
+
+        self._idp_logout = idp_logout
+
     async def default_handle_logout(self):
         """The default logout action
         Optionally cleans up servers, clears cookies, increments logout counter
@@ -144,18 +163,21 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
             await self.slo_logout(username)
 
     async def slo_logout(self, username: str):
-        for cookie in self.session_cookie_names:
-            self.clear_cookie(cookie)
-
         request = format_request(self.request)
         auth = OneLogin_Saml2_Auth(
             request,
             custom_base_path=self.saml_settings_path
         )
+        return onelogin_auth
+        for cookie in self.session_cookie_names:
+            self.clear_cookie(cookie)
+
         session_cache = cache.get()
         user_entry = session_cache.get(username)
         session_cache.remove(username)
-        return self.redirect(auth.logout(name_id=user_entry.name_id, session_index=user_entry.session_index, **self.logout_kwargs))
+
+        if self.idp_logout:
+            return self.redirect(auth.logout(name_id=user_entry.name_id, session_index=user_entry.session_index, **self.logout_kwargs))
 
 
 class ACSHandler(BaseHandler, BaseHandlerMixin):
@@ -169,7 +191,6 @@ class ACSHandler(BaseHandler, BaseHandlerMixin):
             request,
             custom_base_path=self.saml_settings_path
         )
-
         auth.process_response()
 
         errors = auth.get_errors()

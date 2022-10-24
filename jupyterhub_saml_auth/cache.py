@@ -150,7 +150,7 @@ def register(cache: Cache):
 
 
 def get():
-    """Singleton method for getting a registered cache. You must register a cache before calling
+    """Singleton function for getting a registered cache. You must register a cache before calling
     this function"""
     global __session_cache
     if not __session_cache:
