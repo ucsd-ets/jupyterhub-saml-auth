@@ -39,7 +39,7 @@ class SAMLAuthenticator(Authenticator):
     )
 
     cache_spec = Dict(
-        {"disabled": True, "type": "disabled", "client": None, "client_args": None},
+        {"disabled": True, "type": "disabled", "client": None, "client_kwargs": None},
         config=True,
         help="""
         Specifications for the session cache. Defaults to disabled.
@@ -162,11 +162,11 @@ class SAMLAuthenticator(Authenticator):
             if self.cache_spec["disabled"]:
                 self.cache_spec["type"] = "disabled"
 
-            if self.cache_spec["client"] and self.cache_spec["client_args"] is not None:
+            if self.cache_spec["client"] and self.cache_spec["client_kwargs"] is not None:
                 created_cache = cache.create(
                     self.cache_spec["type"],
                     self.cache_spec["client"],
-                    self.cache_spec["client_args"],
+                    self.cache_spec["client_kwargs"],
                 )
             elif self.cache_spec["client"] is not None:
                 created_cache = cache.create(

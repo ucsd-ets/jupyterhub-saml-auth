@@ -18,7 +18,7 @@ if REDIS_PASSWORD is None:
     raise TypeError("REDIS_PASSWORD environment variable is set to None")
 
 redis_client = Redis
-redis_client_args = {
+redis_client_kwargs = {
     "host": REDIS_HOST,
     "port": REDIS_PORT,
     "password": REDIS_PASSWORD,
@@ -39,7 +39,7 @@ c.SAMLAuthenticator.cache_spec = {
     "disabled": False,
     "type": "redis",
     "client": redis_client,
-    "client_args": redis_client_args,
+    "client_kwargs": redis_client_kwargs,
 }
 
 c.JupyterHub.authenticator_class = "jupyterhub_saml_auth.SAMLAuthenticator"

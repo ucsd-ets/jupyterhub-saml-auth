@@ -89,8 +89,8 @@ class RedisCache(Cache):
         client: The Redis client.
     """
 
-    def __init__(self, client: Redis, client_args: dict[str, Any]):
-        self.client = client(**client_args)
+    def __init__(self, client: Redis, client_kwargs: dict[str, Any]):
+        self.client = client(**client_kwargs)
 
     def upsert(self, username: str, session_entry: SessionEntry):
         session_entry: dict = vars(session_entry)
@@ -115,13 +115,13 @@ class RedisCache(Cache):
 cache_map = {"redis": RedisCache, "in-memory": InMemoryCache, "disabled": DisabledCache}
 
 
-def create(cache_type: str, client=None, client_args: dict = dict()) -> Cache:
+def create(cache_type: str, client=None, client_kwargs: dict = dict()) -> Cache:
     """Factory for creating a cache
 
     Args:
         cache_type (str): type of cache. Allowed value = {redis, in-memory, disabled}.
         client: The type of the client.
-        client_args: The constructor arguments for the client.
+        client_kwargs: The constructor arguments for the client.
 
     Raises:
         CacheError: undefined cache type
@@ -135,7 +135,7 @@ def create(cache_type: str, client=None, client_args: dict = dict()) -> Cache:
         )
 
     if client is not None:
-        return cache_map[cache_type](client, client_args)
+        return cache_map[cache_type](client, client_kwargs)
     else:
         return cache_map[cache_type]()
 
