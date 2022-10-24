@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 from dataclasses import dataclass
 from typing import Any
 
@@ -43,8 +43,15 @@ class Cache(metaclass=ABCMeta):
     def remove(self, username: str):
         pass
 
+    @property
+    @abstractmethod
+    def client_required(self) -> bool:
+        pass
+
 
 class InMemoryCache(Cache):
+    client_required = False
+
     def __init__(self):
         self._cache = {}
 
@@ -73,6 +80,8 @@ class InMemoryCache(Cache):
 
 
 class DisabledCache(Cache):
+    client_required = False
+
     def upsert(self, username: str, session_entry: SessionEntry):
         return
 
@@ -88,6 +97,8 @@ class RedisCache(Cache):
     Args:
         client: The Redis client.
     """
+
+    client_required = True
 
     def __init__(self, client: Redis, client_kwargs: dict[str, Any]):
         self.client = client(**client_kwargs)
@@ -115,13 +126,11 @@ class RedisCache(Cache):
 cache_map = {"redis": RedisCache, "in-memory": InMemoryCache, "disabled": DisabledCache}
 
 
-def create(cache_type: str, client=None, client_kwargs: dict = dict()) -> Cache:
+def create(cache_spec: dict) -> Cache:
     """Factory for creating a cache
 
     Args:
-        cache_type (str): type of cache. Allowed value = {redis, in-memory, disabled}.
-        client: The type of the client.
-        client_kwargs: The constructor arguments for the client.
+        cache_spec (dict): SPecifications for a cache
 
     Raises:
         CacheError: undefined cache type
@@ -129,15 +138,27 @@ def create(cache_type: str, client=None, client_kwargs: dict = dict()) -> Cache:
     Returns:
         Cache: an instance of a cache
     """
+    # check cache_spec keys
+    if 'type' not in cache_spec:
+        raise AttributeError(f"you must specify key = 'type' in cache_spec")
+
+    # check cache type
+    cache_type = cache_spec["type"]
     if cache_type not in cache_map:
         raise CacheError(
             f"couldn't create the cache. cache_type = {cache_type} is not allowed. Allowed values = {cache_map.keys()}"
         )
 
-    if client is not None:
-        return cache_map[cache_type](client, client_kwargs)
-    else:
-        return cache_map[cache_type]()
+    cache_to_created = cache_map[cache_type]
+    if cache_to_created.client_required:
+        # check client specifications
+        if "client" not in cache_spec and "client_kwargs" not in cache_spec:
+            raise AttributeError(
+                f"specify either client or client_kwargs in cache_spec. Its required for type = {cache_type}"
+            )
+        return cache_map[cache_type](cache_spec["client"], cache_spec["client_kwargs"])
+    
+    return cache_map[cache_type]()
 
 
 def register(cache: Cache):

@@ -5,8 +5,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 import time
 import pytest
+import os
 
 SECONDS_WAIT = 15
+
+@pytest.fixture
+def setup_docker_env():
+    os.system('docker compose up -d')
+    yield
+    os.system('docker compose down')
 
 
 @pytest.fixture()
@@ -39,7 +46,7 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
     )
 
 
-def test_authentication(driver):
+def test_disabled_cache_authentication(setup_docker_env, driver):
     driver.get("http://localhost:8000/hub/saml_login")
     wait_for_element(driver, By.ID, "username").send_keys("user1")
 

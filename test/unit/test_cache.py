@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import MagicMock
 from jupyterhub_saml_auth.cache import *
 
 test_username = 'user1'
@@ -50,13 +51,34 @@ class TestDisabledCache:
     def test_remove(self, disabled_cache):
         disabled_cache.remove(test_username)
 
+@pytest.fixture
+def cache_details():
+    cache_details = []
+    for cache_type, cache_cls in cache_map.items():
+        cache_spec = {
+            'type': cache_type
+        }
+        if cache_cls.client_required:
+            cache_spec.update({
+                'client': MagicMock(),
+                'client_kwargs': {}
+            })
+        cache_details.append(
+            (cache_type, cache_cls, cache_spec)
+        )
+        
+    return cache_details
 
-def test_create():
-    for cache_name, cache_cls in cache_map.items():
-        assert isinstance(create(cache_name), cache_cls), cache_name
+def test_create(cache_details):
+
+    for cache_type, cache_cls, cache_spec in cache_details:
+        created_cache = create(cache_spec)
+        assert isinstance(created_cache, cache_cls), cache_type
 
     with pytest.raises(CacheError):
-        create('unspecified')
+        create({
+            'type': 'unspecified'
+        })
 
 
 def test_get_fail():
@@ -67,12 +89,13 @@ def test_get_fail():
         get()
 
 
-def test_register():
-    for cache_name, cache in cache_map.items():
+def test_register(cache_details):
+    for cache_type, _, cache_spec in cache_details:
         try:
-            register(cache())
+            created_cache = create(cache_spec)
+            register(created_cache)
         except:
-            pytest.fail(f"cache couldnt register = {cache_name}")
+            pytest.fail(f"cache couldnt register = {cache_type}")
 
     class FakeCache:
         pass
