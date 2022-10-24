@@ -4,3 +4,4 @@ flake8
 jupyterhub
 python3-saml>=1.14.0
 redis
+black
