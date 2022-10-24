@@ -2,6 +2,28 @@
 import pwd
 import subprocess
 import jupyterhub_saml_auth
+from os import getenv
+from redis import Redis
+
+REDIS_HOST = getenv("REDIS_HOST")
+if REDIS_HOST is None:
+    raise TypeError("REDIS_HOST environment variable is set to None")
+
+REDIS_PORT = getenv("REDIS_PORT")
+if REDIS_PORT is None:
+    raise TypeError("REDIS_PORT environment variable is set to None")
+
+REDIS_PASSWORD = getenv("REDIS_PASSWORD")
+if REDIS_PASSWORD is None:
+    raise TypeError("REDIS_PASSWORD environment variable is set to None")
+
+redis_client = Redis
+redis_client_args = {
+    "host": REDIS_HOST,
+    "port": REDIS_PORT,
+    "password": REDIS_PASSWORD,
+    "decode_responses": True
+}
 
 
 def extract_username(acs_handler, attributes):
@@ -13,7 +35,7 @@ def extract_username(acs_handler, attributes):
 c.SAMLAuthenticator.saml_settings_path = "/app/etc"
 c.SAMLAuthenticator.session_cookie_names = {"PHPSESSIDIDP", "SimpleSAMLAuthTokenIdp"}
 c.SAMLAuthenticator.extract_username = extract_username
-c.SAMLAuthenticator.cache_spec = {"disabled": False, "type": "redis", "client": None}
+c.SAMLAuthenticator.cache_spec = {"disabled": False, "type": "redis", "client": redis_client, "client_args": redis_client_args}
 
 c.JupyterHub.authenticator_class = "jupyterhub_saml_auth.SAMLAuthenticator"
 

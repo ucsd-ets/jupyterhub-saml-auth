@@ -50,6 +50,8 @@ redis:
     ports:
     - "6379:6379"
     - "8001:8001"
+    environment:
+    - REDIS_ARGS="--requirepass <PASSWORD>"
 ```
 
 Production
@@ -58,6 +60,8 @@ redis:
     image: redis/redis-stack-server:latest
     ports:
     - "6379:6379"
+    environment:
+    - REDIS_ARGS="--requirepass <PASSWORD>"
 ```
 
 ## Development

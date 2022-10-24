@@ -42,7 +42,8 @@ class SAMLAuthenticator(Authenticator):
         {
             'disabled': True,
             'type': 'disabled',
-            'client': None
+            'client': None,
+            'client_args': None
         },
         config=True,
         help='''
@@ -153,7 +154,11 @@ class SAMLAuthenticator(Authenticator):
             if self.cache_spec['disabled']:
                 self.cache_spec['type'] = 'disabled'
 
-            created_cache = cache.create(self.cache_spec['type'])
+            if self.cache_spec['client'] and self.cache_spec['client_args'] is not None:
+                created_cache = cache.create(self.cache_spec['type'], self.cache_spec['client'], self.cache_spec['client_args'])
+            elif self.cache_spec['client'] is not None:
+                created_cache = cache.create(self.cache_spec['type'], self.cache_spec['client'])
+
             cache.register(created_cache)
 
     def get_handlers(self, app):

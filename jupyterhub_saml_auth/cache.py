@@ -1,19 +1,10 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
+from typing import Any
 
-import redis
-from redis.commands.json.path import Path as RedisJsonPath
 from tornado.log import app_log
-from os import getenv
-
-REDIS_HOST = getenv("REDIS_HOST")
-if REDIS_HOST is None:
-    raise TypeError("REDIS_HOST environment variable is set to None")
-
-REDIS_PORT = getenv("REDIS_PORT")
-if REDIS_PORT is None:
-    raise TypeError("REDIS_PORT environment variable is set to None")
-
+from redis.commands.json.path import Path as RedisJsonPath
+from redis import Redis
 
 __session_cache = None
 
@@ -93,12 +84,16 @@ class DisabledCache(Cache):
 
 
 class RedisCache(Cache):
-    def __init__(self):
-        self.r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+    """
+    Args:
+        client: The Redis client.
+    """
+    def __init__(self, client: Redis, client_args: dict[str, Any]):
+        self.client = client(**client_args)
 
     def upsert(self, username: str, session_entry: SessionEntry):
         session_entry: dict = vars(session_entry)
-        self.r.json().set(
+        self.client.json().set(
             name=username,
             path=RedisJsonPath.root_path(),
             obj=session_entry,
@@ -106,24 +101,26 @@ class RedisCache(Cache):
         )
 
     def get(self, username: str) -> SessionEntry:
-        session_entry: str = self.r.json().get(username, RedisJsonPath.root_path())
+        session_entry: str = self.client.json().get(username, RedisJsonPath.root_path())
         session_entry: SessionEntry = SessionEntry(**session_entry)
         if not isinstance(session_entry, SessionEntry):
             raise TypeError(f"session entry for {username} is not of type SessionEntry")
         return session_entry
 
     def remove(self, username: str):
-        self.r.json().delete(username, path=RedisJsonPath.root_path())
+        self.client.json().delete(username, path=RedisJsonPath.root_path())
 
 
 cache_map = {"redis": RedisCache, "in-memory": InMemoryCache, "disabled": DisabledCache}
 
 
-def create(cache_type: str) -> Cache:
+def create(cache_type: str, client=None, client_args: dict = dict()) -> Cache:
     """Factory for creating a cache
 
     Args:
-        cache_type (str): type of cache. Allowed value = {redis, in-memory, disabled}
+        cache_type (str): type of cache. Allowed value = {redis, in-memory, disabled}.
+        client: The type of the client.
+        client_args: The constructor arguments for the client.
 
     Raises:
         CacheError: undefined cache type
@@ -136,7 +133,10 @@ def create(cache_type: str) -> Cache:
             f"couldn't create the cache. cache_type = {cache_type} is not allowed. Allowed values = {cache_map.keys()}"
         )
 
-    return cache_map[cache_type]()
+    if client is not None:
+        return cache_map[cache_type](client, client_args)
+    else:
+        return cache_map[cache_type]()
 
 
 def register(cache: Cache):
