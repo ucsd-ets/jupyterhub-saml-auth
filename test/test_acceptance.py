@@ -6,14 +6,26 @@ from selenium.webdriver.support import expected_conditions
 import time
 import pytest
 import os
+import json
+import redis
+from redis.commands.json.path import Path as RedisJsonPath
+from jupyterhub_saml_auth.cache import SessionEntry
 
 SECONDS_WAIT = 15
 
 @pytest.fixture
-def setup_docker_env():
+def setup_docker_env(request):
+    # set environment variables before test
+    for k, v in request.param.items():
+        os.environ[k] = v
+    
     os.system('docker compose up -d')
+    
     yield
+
     os.system('docker compose down')
+    for k, v in request.param.items():
+        del os.environ[k]
 
 
 @pytest.fixture()
@@ -39,14 +51,7 @@ def driver(pytestconfig):
 
     driver.quit()
 
-
-def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
-    return WebDriverWait(driver, SECONDS_WAIT).until(
-        expected_conditions.element_to_be_clickable((selector, selector_value))
-    )
-
-
-def test_disabled_cache_authentication(setup_docker_env, driver):
+def login_test(driver):
     driver.get("http://localhost:8000/hub/saml_login")
     wait_for_element(driver, By.ID, "username").send_keys("user1")
 
@@ -59,13 +64,60 @@ def test_disabled_cache_authentication(setup_docker_env, driver):
 
     assert driver.current_url == "http://localhost:8000/user/user1/tree/?"
 
+    return driver
+
+def logout_test(driver):
+    # check cookies set
     cookies_names_to_check = {"SimpleSAMLAuthTokenIdp", "jupyterhub-session-id"}
     current_cookies = set(map(lambda cookie: cookie["name"], driver.get_cookies()))
-    assert cookies_names_to_check.issubset(current_cookies)
+    assert cookies_names_to_check.issubset(current_cookies), current_cookies
 
     # logout
     wait_for_element(driver, By.ID, "logout").click()
-
     cookies = driver.get_cookies()
     for cookie in cookies:
         assert cookie["name"] not in cookies_names_to_check, cookie["name"]
+    
+    # SLO logout
+    driver.get("http://localhost:8000/hub/saml_login")
+    assert driver.current_url.startswith('http://localhost:8080')
+    
+    return driver
+
+
+def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
+    return WebDriverWait(driver, SECONDS_WAIT).until(
+        expected_conditions.element_to_be_clickable((selector, selector_value))
+    )
+
+
+# @pytest.mark.parametrize('setup_docker_env', [{}], indirect=True)
+# def test_defaults(setup_docker_env, driver):
+#     """Default settings
+
+#     cache_spec = {'type': 'disabled'}
+#     """
+#     driver = login_test(driver)
+#     logout_test(driver)
+
+
+
+
+@pytest.mark.parametrize('setup_docker_env', [{'TEST_ENV': 'redis'}], indirect=True)
+def test_redis_cache(setup_docker_env, driver):
+    driver = login_test(driver)
+
+    r = redis.Redis(
+        host='localhost',
+        port=os.getenv('REDIS_PORT'),
+        password=os.getenv('REDIS_PASSWORD'),
+        decode_responses=True
+    )
+
+    session_args = r.json().get('user1', RedisJsonPath.root_path())
+    assert session_args
+    session_entry = SessionEntry(**session_args)
+    for field, value in session_entry.__dataclass_fields__.items():
+        assert value, (field, value)
+    
+    logout_test(driver)

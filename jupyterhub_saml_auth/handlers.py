@@ -73,7 +73,7 @@ class BaseHandlerMixin:
                     = {dir_contents}')
 
     @property
-    def auth(self) -> OneLogin_Saml2_Auth:
+    def setup_auth(self) -> OneLogin_Saml2_Auth:
         request = format_request(self.request)
         onelogin_auth = OneLogin_Saml2_Auth(
             request,
@@ -168,7 +168,6 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
             request,
             custom_base_path=self.saml_settings_path
         )
-        return onelogin_auth
         for cookie in self.session_cookie_names:
             self.clear_cookie(cookie)
 
@@ -177,6 +176,7 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
         session_cache.remove(username)
 
         if self.idp_logout:
+            app_log.info(f'Logging {username} out of the idp. Redirecting')
             return self.redirect(auth.logout(name_id=user_entry.name_id, session_index=user_entry.session_index, **self.logout_kwargs))
 
 

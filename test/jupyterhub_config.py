@@ -13,8 +13,9 @@ cache_spec = {
     "client": None,
     "client_kwargs": None,
 }
-
+print("starting redis \n\n\n\n\n")
 if TEST_ENV == "redis":
+    
     REDIS_HOST = getenv("REDIS_HOST")
     if REDIS_HOST is None:
         raise TypeError("REDIS_HOST environment variable is set to None")

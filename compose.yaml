@@ -7,7 +7,7 @@ services:
     environment:
     - SIMPLESAMLPHP_SP_ENTITY_ID=http://localhost:8000/hub/metadata/
     - SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE=http://localhost:8000/hub/acs
-    - SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE=http://localhost:8000
+    - SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE=http://localhost:8000/
   jupyterhub:
     build: .
     ports:
@@ -22,8 +22,9 @@ services:
     - /etc/jupyterhub-saml-auth/jupyterhub_config.py
     environment:
     - REDIS_HOST=redis
-    - REDIS_PORT=6379
-    - REDIS_PASSWORD=super-secret
+    - REDIS_PORT=${REDIS_PORT}
+    - REDIS_PASSWORD=${REDIS_PASSWORD}
+    - TEST_ENV=${TEST_ENV}
   redis:
     image: redis/redis-stack-server:latest
     ports:

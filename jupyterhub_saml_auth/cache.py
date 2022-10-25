@@ -6,6 +6,7 @@ from tornado.log import app_log
 from redis.commands.json.path import Path as RedisJsonPath
 from redis import Redis
 
+
 __session_cache = None
 
 
@@ -150,12 +151,14 @@ def create(cache_spec: dict) -> Cache:
         )
 
     cache_to_created = cache_map[cache_type]
+    app_log.info(f"Creating cache['type'] = {cache_type}")
     if cache_to_created.client_required:
         # check client specifications
         if "client" not in cache_spec and "client_kwargs" not in cache_spec:
             raise AttributeError(
                 f"specify either client or client_kwargs in cache_spec. Its required for type = {cache_type}"
             )
+        
         return cache_map[cache_type](cache_spec["client"], cache_spec["client_kwargs"])
 
     return cache_map[cache_type]()
