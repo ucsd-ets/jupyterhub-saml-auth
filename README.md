@@ -87,25 +87,12 @@ c.SAMLAuthenticator.cache_spec = {
 
 ### Redis Configuration in Docker Compose
 
-Development
-```yaml
-redis:
-    image: redis/redis-stack:latest
-    ports:
-    - "6379:6379"
-    - "8001:8001"
-    environment:
-    - REDIS_ARGS="--requirepass <PASSWORD>"
-```
+Create a `.env` file with the following environment variables:
 
-Production
-```yaml
-redis:
-    image: redis/redis-stack-server:latest
-    ports:
-    - "6379:6379"
-    environment:
-    - REDIS_ARGS="--requirepass <PASSWORD>"
+```bash
+REDIS_HOST
+REDIS_PORT
+REDIS_PASSWORD
 ```
 
 ## Development

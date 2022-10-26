@@ -30,4 +30,4 @@ services:
     ports:
     - "6379:6379"
     environment:
-    - REDIS_ARGS=--requirepass super-secret
+    - REDIS_ARGS=--requirepass ${REDIS_PASSWORD}
