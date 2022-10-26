@@ -88,13 +88,6 @@ class SAMLAuthenticator(Authenticator):
         config=True,
     )
 
-    set_session = Callable(
-        help="""
-        Structure the session object upon login.
-        """,
-        config=True,
-    )
-
     login_service = Unicode(
         os.environ.get("LOGIN_SERVICE", "SSO"),
         config=True,

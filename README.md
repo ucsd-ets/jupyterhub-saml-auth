@@ -30,11 +30,55 @@ c.SAMLAuthenticator.saml_settings_path = '/app/etc'
 # once the user hits 'logout'
 c.SAMLAuthenticator.session_cookie_names = {'PHPSESSIDIDP', 'SimpleSAMLAuthTokenIdp'}
 
+# Sessions can be cached. See Cache section below for more info
+c.SAMLAuthenticator.cache_spec = {
+    'type': 'disabled',
+    'client': None,
+    'client_kwargs': None
+}
+
+# redirect to idp single logout 
+c.SAMLAuthenticator.idp_logout = True
+
+# pass extra properties to the logout handler upon single logout
+# see https://github.com/onelogin/python3-saml/blob/ba572e24fd3028c0e38c8f9dcd02af46ddcc0870/src/onelogin 
+# for all available properties 
+c.SAMLAuthenticator.logout_kwargs = {}
+
 # Function that extracts the username from the SAML attributes.
 c.SAMLAuthenticator.extract_username = extract_username
 
 # register the SAML authenticator with jupyterhub
 c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.SAMLAuthenticator'
+```
+
+### Specify the Cache
+
+Cache is specified by `c.SAMLAuthenticator.cache_spec` and has 3 fields: `type`, `client`, and `client_kwargs`.
+
+`type` currently has three types: `disabled`, `in-memory`, and `redis`.
+
+specifying `client` and `client_kwargs` is not required for `disabled` and `in-memory` types
+
+Example of how to specify `redis` below
+
+```python
+# in jupyterhub_config.py
+import redis
+import os
+
+redis_client = redis.Redis
+# arguments to pass to client upon creation
+redis_kwargs = {
+    'host': os.getenv('REDIS_HOST'),
+    'port': os.getenv('REDIS_PORT')
+}
+
+c.SAMLAuthenticator.cache_spec = {
+    'type': redis,
+    'client': redis_client,
+    'client_kwargs': redis_kwargs
+}
 ```
 
 ### Environment variables
