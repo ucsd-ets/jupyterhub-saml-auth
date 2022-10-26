@@ -4,7 +4,6 @@ import tornado
 from tornado.log import app_log
 import tornado.web
 import os
-import logging
 from . import cache
 
 __all__ = [

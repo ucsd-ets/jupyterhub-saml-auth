@@ -8,7 +8,6 @@ from .handlers import (
     MetadataHandler,
     SamlLoginHandler,
     SamlLogoutHandler,
-    session_cache,
 )
 from . import cache
 
