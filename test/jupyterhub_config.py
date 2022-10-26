@@ -8,12 +8,9 @@ from redis import Redis
 # Setup the test environment
 TEST_ENV = getenv("TEST_ENV")
 cache_spec = {
-    "disabled": False,
     "type": "disabled",
-    "client": None,
-    "client_kwargs": None,
 }
-print("starting redis \n\n\n\n\n")
+
 if TEST_ENV == "redis":
     
     REDIS_HOST = getenv("REDIS_HOST")

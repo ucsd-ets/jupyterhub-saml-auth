@@ -15,3 +15,4 @@ share/
 *.pid
 *.cfg
 dist/
+browsermob-*

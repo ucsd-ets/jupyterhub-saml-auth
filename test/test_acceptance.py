@@ -1,4 +1,3 @@
-import unittest
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -6,50 +5,82 @@ from selenium.webdriver.support import expected_conditions
 import time
 import pytest
 import os
-import json
 import redis
+from dotenv import load_dotenv
 from redis.commands.json.path import Path as RedisJsonPath
 from jupyterhub_saml_auth.cache import SessionEntry
+import threading
 
 SECONDS_WAIT = 15
+load_dotenv()
+
+url_history = set()
+
 
 @pytest.fixture
 def setup_docker_env(request):
     # set environment variables before test
     for k, v in request.param.items():
         os.environ[k] = v
-    
-    os.system('docker compose up -d')
-    
+
+    os.system("docker compose up -d")
+
     yield
 
-    os.system('docker compose down')
+    os.system("docker compose down")
     for k, v in request.param.items():
         del os.environ[k]
 
 
 @pytest.fixture()
-def driver(pytestconfig):
+def driver_options(pytestconfig):
     browser = pytestconfig.getoption("browser")
     headless = pytestconfig.getoption("headless")
-
     if browser == "firefox":
         options = webdriver.FirefoxOptions()
         if headless:
             options.headless = True
-        driver = webdriver.Firefox(options=options)
+        return (webdriver.Firefox, options, webdriver.FirefoxProfile)
     elif browser == "chrome":
         options = webdriver.ChromeOptions()
         if headless:
             options.headless = True
-        driver = webdriver.Chrome(options=options)
+        return (webdriver.Chrome, options, webdriver.ChromeProfile)
 
     else:
         raise Exception(f"No browser option available for {browser}")
 
+
+@pytest.fixture()
+def driver(driver_options):
+    driver_cls, selected_options, _ = driver_options
+    driver = driver_cls(options=selected_options)
     yield driver
 
     driver.quit()
+
+
+@pytest.fixture()
+def proxy_driver(driver_options):
+    driver_cls, selected_options, _ = driver_options
+    driver = driver_cls(options=selected_options)
+
+    def watch_urls(driver):
+        while True:
+            global url_history
+            url = driver.current_url
+            url_history.add(url)
+            time.sleep(0.1)
+
+    history_thread = threading.Thread(target=watch_urls, args=(driver,), daemon=True)
+    history_thread.start()
+
+    yield driver
+
+    driver.quit()
+    history_thread.join()
+    url_history.clear()
+
 
 def login_test(driver):
     driver.get("http://localhost:8000/hub/saml_login")
@@ -66,6 +97,7 @@ def login_test(driver):
 
     return driver
 
+
 def logout_test(driver):
     # check cookies set
     cookies_names_to_check = {"SimpleSAMLAuthTokenIdp", "jupyterhub-session-id"}
@@ -77,11 +109,11 @@ def logout_test(driver):
     cookies = driver.get_cookies()
     for cookie in cookies:
         assert cookie["name"] not in cookies_names_to_check, cookie["name"]
-    
-    # SLO logout
+
+    # SLO logout, confirm that clicking login again is logged out of idp
     driver.get("http://localhost:8000/hub/saml_login")
-    assert driver.current_url.startswith('http://localhost:8080')
-    
+    assert driver.current_url.startswith("http://localhost:8080")
+
     return driver
 
 
@@ -91,33 +123,33 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
     )
 
 
-# @pytest.mark.parametrize('setup_docker_env', [{}], indirect=True)
-# def test_defaults(setup_docker_env, driver):
-#     """Default settings
+@pytest.mark.parametrize("setup_docker_env", [{}], indirect=True)
+def test_defaults(setup_docker_env, driver):
+    """Default settings
 
-#     cache_spec = {'type': 'disabled'}
-#     """
-#     driver = login_test(driver)
-#     logout_test(driver)
-
-
+    cache_spec = {'type': 'disabled'}
+    """
+    driver = login_test(driver)
+    logout_test(driver)
 
 
-@pytest.mark.parametrize('setup_docker_env', [{'TEST_ENV': 'redis'}], indirect=True)
+@pytest.mark.parametrize("setup_docker_env", [{"TEST_ENV": "redis"}], indirect=True)
 def test_redis_cache(setup_docker_env, driver):
+    r = redis.Redis(
+        host="localhost",
+        port=os.getenv("REDIS_PORT"),
+        password=os.getenv("REDIS_PASSWORD"),
+        decode_responses=True,
+    )
+    assert r.ping()
+
     driver = login_test(driver)
 
-    r = redis.Redis(
-        host='localhost',
-        port=os.getenv('REDIS_PORT'),
-        password=os.getenv('REDIS_PASSWORD'),
-        decode_responses=True
-    )
-
-    session_args = r.json().get('user1', RedisJsonPath.root_path())
+    # check that the user has been registered in redis
+    session_args = r.json().get("user1", RedisJsonPath.root_path())
     assert session_args
     session_entry = SessionEntry(**session_args)
     for field, value in session_entry.__dataclass_fields__.items():
         assert value, (field, value)
-    
+
     logout_test(driver)
