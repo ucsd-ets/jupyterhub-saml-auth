@@ -83,11 +83,7 @@ class BaseHandlerMixin:
 class MetadataHandler(BaseHandler, BaseHandlerMixin):
 
     def get(self):
-        request = format_request(self.request)
-        auth = OneLogin_Saml2_Auth(
-            request,
-            custom_base_path=self.saml_settings_path
-        )
+        auth = self.setup_auth()
         saml_settings = auth.get_settings()
         metadata = saml_settings.get_sp_metadata()
         errors = saml_settings.validate_metadata(metadata)
@@ -102,11 +98,7 @@ class MetadataHandler(BaseHandler, BaseHandlerMixin):
 
 class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
     async def get(self):
-        request = format_request(self.request)
-        auth = OneLogin_Saml2_Auth(
-            request,
-            custom_base_path=self.saml_settings_path
-        )
+        auth = self.setup_auth()
         return_to = f'{self.request.host}/acs'
         return self.redirect(auth.login(return_to))
 
@@ -161,11 +153,7 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
             await self.slo_logout(username)
 
     async def slo_logout(self, username: str):
-        request = format_request(self.request)
-        auth = OneLogin_Saml2_Auth(
-            request,
-            custom_base_path=self.saml_settings_path
-        )
+        auth = self.setup_auth()
         for cookie in self.session_cookie_names:
             self.clear_cookie(cookie)
 
@@ -183,11 +171,7 @@ class ACSHandler(BaseHandler, BaseHandlerMixin):
     https://goteleport.com/blog/how-saml-authentication-works/
     """
     async def post(self):
-        request = format_request(self.request)
-        auth = OneLogin_Saml2_Auth(
-            request,
-            custom_base_path=self.saml_settings_path
-        )
+        auth = self.setup_auth()
         auth.process_response()
 
         errors = auth.get_errors()
