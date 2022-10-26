@@ -14,8 +14,6 @@ import threading
 SECONDS_WAIT = 15
 load_dotenv()
 
-url_history = set()
-
 
 @pytest.fixture
 def setup_docker_env(request):
@@ -58,28 +56,6 @@ def driver(driver_options):
     yield driver
 
     driver.quit()
-
-
-@pytest.fixture()
-def proxy_driver(driver_options):
-    driver_cls, selected_options, _ = driver_options
-    driver = driver_cls(options=selected_options)
-
-    def watch_urls(driver):
-        while True:
-            global url_history
-            url = driver.current_url
-            url_history.add(url)
-            time.sleep(0.1)
-
-    history_thread = threading.Thread(target=watch_urls, args=(driver,), daemon=True)
-    history_thread.start()
-
-    yield driver
-
-    driver.quit()
-    history_thread.join()
-    url_history.clear()
 
 
 def login_test(driver):
