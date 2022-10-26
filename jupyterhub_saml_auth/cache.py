@@ -158,7 +158,7 @@ def create(cache_spec: dict) -> Cache:
             raise AttributeError(
                 f"specify either client or client_kwargs in cache_spec. Its required for type = {cache_type}"
             )
-        
+
         return cache_map[cache_type](cache_spec["client"], cache_spec["client_kwargs"])
 
     return cache_map[cache_type]()

@@ -51,10 +51,10 @@ class SAMLAuthenticator(Authenticator):
     idp_logout = Bool(
         True,
         config=True,
-        help='''
+        help="""
         If set to true, upon logout, will redirect to the IdP single sign out URL. If not,
         it'll juset clear the cookies defined in "session_cookies".
-        '''
+        """,
     )
 
     logout_kwargs = Dict(
