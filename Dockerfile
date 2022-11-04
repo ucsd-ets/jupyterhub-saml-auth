@@ -26,4 +26,4 @@ RUN python3 setup.py bdist_wheel && \
     pip install dist/*.whl
 
 # install kubernetes if using k8s image
-RUN /bin/bash -c "[[ "$BASE_IMG" == *"k8s"* ]] && pip install -e .[kubernetes]"
+RUN if [[ "$BASE_IMG" == *"k8s"* ]]; then pip install -e .[kubernetes]; fi
