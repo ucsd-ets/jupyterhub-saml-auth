@@ -46,7 +46,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}-k8s-hub
           labels: ${{ steps.meta.outputs.labels }}-k8s-hub
           # https://github.com/docker/build-push-action/issues/380
           build-args: |
