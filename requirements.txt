@@ -1,9 +1,10 @@
-pytest
-selenium
-flake8
 jupyterhub
 python3-saml>=1.14.0
 redis
+build
+pytest
+selenium
+flake8
 black
 python-dotenv
-pytest-parallel
+kubernetes

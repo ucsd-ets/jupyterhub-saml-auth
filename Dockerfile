@@ -1,11 +1,9 @@
 ARG BASE_IMG=jupyterhub/jupyterhub:3
-
 FROM ${BASE_IMG}
 
-COPY . /app
-WORKDIR /app
-
 USER root
+
+ENV IMAGE_ID=${BASE_IMG}
 
 RUN apt-get update && \
     apt-get install -y xmlsec1 \
@@ -21,5 +19,11 @@ RUN apt-get update && \
                        gcc \
                        python3-dev
 
-RUN pip install --upgrade pip &&  \
-    pip install -e .
+COPY . /app
+WORKDIR /app
+
+RUN python3 setup.py bdist_wheel && \
+    pip install dist/*.whl
+
+# install kubernetes if using k8s image
+RUN [[ "$BASE_IMG" == *"k8s"* pip install -e .[kubernetes] ]]

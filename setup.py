@@ -38,5 +38,22 @@ setup(name='jupyterhub_saml_auth',
         "Operating System :: OS Independent",
     ],
     python_requires=f">={MIN_PYTHON_VERSION}",
-    install_requires=['python3-saml','jupyterhub','traitlets>=5.0.0','notebook', 'redis']
+    install_requires=[
+        'python3-saml',
+        'jupyterhub',
+        'traitlets>=5.0.0',
+        'notebook',
+        'redis',
+    ],
+    extra_requires={
+        'kubernetes': [
+            'kubernetes',
+        ],
+        'dev': [
+            'python-dotenv',
+            'black',
+            'flake8',
+            'selenium',
+        ]
+    }
 )
