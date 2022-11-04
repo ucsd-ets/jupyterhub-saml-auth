@@ -5,6 +5,8 @@ FROM ${BASE_IMG}
 COPY . /app
 WORKDIR /app
 
+USER root
+
 RUN apt-get update && \
     apt-get install -y xmlsec1 \
                        libxmlsec1-dev \
