@@ -1,4 +1,6 @@
-FROM jupyterhub/jupyterhub:3
+ARG BASE_IMG=jupyterhub/jupyterhub:3
+
+FROM ${BASE_IMG}
 
 COPY . /app
 WORKDIR /app
