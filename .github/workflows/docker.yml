@@ -49,4 +49,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}-k8s-hub
           build-args: |
-          - BASE_IMG=jupyterhub/k8s-hub:2.0.0
+            BASE_IMG=jupyterhub/k8s-hub:2.0.0
