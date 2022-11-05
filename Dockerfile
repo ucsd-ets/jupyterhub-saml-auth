@@ -24,3 +24,5 @@ WORKDIR /app
 
 RUN python3 setup.py bdist_wheel && \
     pip install dist/*.whl
+
+RUN if echo $BASE_IMG | grep k8s; then pip install .[kubernetes] ; fi
