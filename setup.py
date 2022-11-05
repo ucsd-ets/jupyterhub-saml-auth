@@ -45,7 +45,7 @@ setup(name='jupyterhub_saml_auth',
         'notebook',
         'redis',
     ],
-    extra_requires={
+    extras_require={
         'kubernetes': [
             'kubernetes',
         ],
