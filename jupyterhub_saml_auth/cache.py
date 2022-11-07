@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Dict
 
 from tornado.log import app_log
 from redis.commands.json.path import Path as RedisJsonPath
@@ -101,7 +101,7 @@ class RedisCache(Cache):
 
     client_required = True
 
-    def __init__(self, client: Redis, client_kwargs: dict[str, Any]):
+    def __init__(self, client: Redis, client_kwargs: Dict[str, Any]):
         self.client = client(**client_kwargs)
 
     def upsert(self, username: str, session_entry: SessionEntry):
