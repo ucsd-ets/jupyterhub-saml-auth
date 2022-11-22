@@ -51,9 +51,18 @@ class SAMLAuthenticator(Authenticator):
         True,
         config=True,
         help="""
-        If set to true, upon logout, will redirect to the IdP single sign out URL. If not,
-        it'll juset clear the cookies defined in "session_cookies".
+        If set to true, upon logout, will redirect to the IdP single logout URL. If not,
+        it'll just clear the cookies defined in "session_cookies".
         """,
+    )
+
+    simple_logout = Bool(
+        False,
+        config=True,
+        help="""
+        Will do a basic redirect to the single logout URL. Note: setting this to True will
+        negate all properties defined within self.logout_kwargs
+        """
     )
 
     logout_kwargs = Dict(
@@ -144,6 +153,7 @@ class SAMLAuthenticator(Authenticator):
         self.logout_handler.logout_kwargs = self.logout_kwargs
         self.logout_handler.idp_logout = self.idp_logout
         self.logout_handler.session_cookie_names = self.session_cookie_names
+        self.logout_handler.simple_logout = self.simple_logout
 
     def _setup_cache(self):
         try:

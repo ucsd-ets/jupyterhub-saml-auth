@@ -137,6 +137,17 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
 
         self._idp_logout = idp_logout
 
+    @property
+    def simple_logout(self):
+        return self._simple_logout
+    
+    @simple_logout.setter
+    def simple_logout(self, simple_logout: bool):
+        if not isinstance(simple_logout, bool):
+            raise AttributeError('You must supply a bool as simple_logout')
+        
+        self._simple_logout = simple_logout
+
     async def default_handle_logout(self):
         """The default logout action
         Optionally cleans up servers, clears cookies, increments logout counter
@@ -162,7 +173,10 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
         session_cache.remove(username)
 
         if self.idp_logout:
-            return self.redirect(auth.logout(name_id=user_entry.name_id, session_index=user_entry.session_index, **self.logout_kwargs))
+            if not self.simple_logout:
+                return self.redirect(auth.logout(name_id=user_entry.name_id, session_index=user_entry.session_index, **self.logout_kwargs))
+            else:
+                self.redirect(auth.get_slo_url())
 
 
 class ACSHandler(BaseHandler, BaseHandlerMixin):
