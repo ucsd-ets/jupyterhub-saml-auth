@@ -176,7 +176,7 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
             if not self.unencrypted_logout:
                 return self.redirect(auth.logout(name_id=user_entry.name_id, session_index=user_entry.session_index, **self.logout_kwargs))
             else:
-                self.redirect(auth.get_slo_url())
+                self.redirect(auth.get_slo_url(), status=307)
 
 
 class ACSHandler(BaseHandler, BaseHandlerMixin):
