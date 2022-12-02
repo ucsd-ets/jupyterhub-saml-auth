@@ -56,7 +56,7 @@ class SAMLAuthenticator(Authenticator):
         """,
     )
 
-    simple_logout = Bool(
+    unencrypted_logout = Bool(
         False,
         config=True,
         help="""
@@ -153,7 +153,7 @@ class SAMLAuthenticator(Authenticator):
         self.logout_handler.logout_kwargs = self.logout_kwargs
         self.logout_handler.idp_logout = self.idp_logout
         self.logout_handler.session_cookie_names = self.session_cookie_names
-        self.logout_handler.simple_logout = self.simple_logout
+        self.logout_handler.unencrypted_logout = self.unencrypted_logout
 
     def _setup_cache(self):
         try:
