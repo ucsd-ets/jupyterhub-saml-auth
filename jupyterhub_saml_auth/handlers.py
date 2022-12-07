@@ -39,6 +39,13 @@ class BaseHandlerMixin:
     def saml_settings_path(self):
         return self._saml_settings_path
 
+    @saml_settings_path.setter
+    def saml_settings_path(self, path):
+        self._saml_settings_path_exists(path)
+        self._settings_files_exist(path)
+
+        self._saml_settings_path = path
+
     @property
     def session_cache(self):
         try:
@@ -50,13 +57,6 @@ class BaseHandlerMixin:
     @session_cache.setter
     def session_cache(self, session_cache):
         self._session_cache = session_cache
-
-    @saml_settings_path.setter
-    def saml_settings_path(self, path):
-        self._saml_settings_path_exists(path)
-        self._settings_files_exist(path)
-
-        self._saml_settings_path = path
 
     def _saml_settings_path_exists(self, path):
         # error checks
