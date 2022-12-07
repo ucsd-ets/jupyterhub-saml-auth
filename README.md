@@ -13,7 +13,7 @@ pip install jupyterhub-saml-auth
 
 ## Configuration
 
-See the `jupyterhub_config.py` example configuration below for how to integrate this package with jupyterhub
+See the `jupyterhub_config.py` example configuration below for how to integrate this package with jupyterhub. For all configuration settings, see `authenticator.py`.
 
 ```python
 def extract_username(acs_handler, attributes):
