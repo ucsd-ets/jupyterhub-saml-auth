@@ -104,6 +104,16 @@ class SAMLAuthenticator(Authenticator):
         """,
     )
 
+    https_override = Bool(
+        False,
+        config=True,
+        help="""
+        the request may use https, however, request.protocol may interpret it
+        as http. Have an environment variable to override this at
+        the app level in case this happens
+        """,
+    )
+
     @validate("saml_settings_path")
     def _valid_saml_settings_path(self, proposed):
         proposed_path = proposed["value"]
@@ -143,17 +153,21 @@ class SAMLAuthenticator(Authenticator):
 
     def _configure_handlers(self):
         self.login_handler.saml_settings_path = self.saml_settings_path
+        self.login_handler.https_override = self.https_override
 
         self.metadata_handler.saml_settings_path = self.saml_settings_path
+        self.metadata_handler.https_override = self.https_override
 
         self.acs_handler.saml_settings_path = self.saml_settings_path
         self.acs_handler.extract_username = self.extract_username
+        self.acs_handler.https_override = self.https_override
 
         self.logout_handler.saml_settings_path = self.saml_settings_path
         self.logout_handler.logout_kwargs = self.logout_kwargs
         self.logout_handler.idp_logout = self.idp_logout
         self.logout_handler.session_cookie_names = self.session_cookie_names
         self.logout_handler.unencrypted_logout = self.unencrypted_logout
+        self.logout_handler.https_override = self.https_override
 
     def _setup_cache(self):
         try:

@@ -9,7 +9,7 @@ from . import cache
 __all__ = ["MetadataHandler", "SamlLoginHandler", "SamlLogoutHandler", "ACSHandler"]
 
 
-def format_request(request):
+def format_request(request, https_override=False):
     dataDict = {}
     for key in request.arguments:
         dataDict[key] = request.arguments[key][0].decode("utf-8")
@@ -18,7 +18,11 @@ def format_request(request):
     # as http. Have an environment variable to override this at
     # the app level in case this happens
     https = "off"
-    if os.environ.get("SAML_HTTPS_OVERRIDE") or request.protocol == "https":
+    if (
+        os.environ.get("SAML_HTTPS_OVERRIDE")
+        or request.protocol == "https"
+        or https_override
+    ):
         https = "on"
 
     result = {
@@ -58,6 +62,14 @@ class BaseHandlerMixin:
     def session_cache(self, session_cache):
         self._session_cache = session_cache
 
+    @property
+    def https_override(self):
+        return self._https_override
+
+    @https_override.setter
+    def https_override(self, https_override):
+        self._https_override = https_override
+
     def _saml_settings_path_exists(self, path):
         # error checks
         if not os.path.isdir(path):
@@ -80,7 +92,7 @@ class BaseHandlerMixin:
                 )
 
     def setup_auth(self) -> OneLogin_Saml2_Auth:
-        request = format_request(self.request)
+        request = format_request(self.request, self.https_override)
         onelogin_auth = OneLogin_Saml2_Auth(
             request, custom_base_path=self.saml_settings_path
         )
