@@ -66,7 +66,7 @@ def login_test(driver):
     wait_for_element(driver, By.CSS_SELECTOR, ".btn").click()
 
     # allow some time for server to spawn
-    time.sleep(5)
+    time.sleep(10)
 
     assert driver.current_url == "http://localhost:8000/user/user1/tree/?"
 
