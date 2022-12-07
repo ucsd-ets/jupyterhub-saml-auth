@@ -62,7 +62,7 @@ class SAMLAuthenticator(Authenticator):
         help="""
         Will do a basic redirect to the single logout URL. Note: setting this to True will
         negate all properties defined within self.logout_kwargs
-        """
+        """,
     )
 
     logout_kwargs = Dict(
