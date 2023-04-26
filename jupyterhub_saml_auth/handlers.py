@@ -69,8 +69,12 @@ class BaseHandlerMixin:
                     settings path. Path = {path}, contents \
                     = {dir_contents}')
 
+    def check_xsrf_cookie(self):
+        # no xsrf check needed here
+        return
 
-class MetadataHandler(BaseHandler, BaseHandlerMixin):
+
+class MetadataHandler(BaseHandlerMixin, BaseHandler):
 
     def get(self):
         request = format_request(self.request)
@@ -90,7 +94,7 @@ class MetadataHandler(BaseHandler, BaseHandlerMixin):
             self.write(', '.join(errors))
 
 
-class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
+class SamlLoginHandler(BaseHandlerMixin, LoginHandler):
 
     async def get(self):
         request = format_request(self.request)
@@ -103,7 +107,7 @@ class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
         return self.redirect(auth.login(return_to))
 
 
-class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
+class SamlLogoutHandler(BaseHandlerMixin, LogoutHandler):
 
     @property
     def session_cookie_names(self):
@@ -124,7 +128,7 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
             self.clear_cookie(cookie)
 
 
-class ACSHandler(BaseHandler, BaseHandlerMixin):
+class ACSHandler(BaseHandlerMixin, BaseHandler):
     """Assertion consumer service (ACS) handler.  This handler checks the data
     received via a POST request from a SAML server within the SAML workflow. 
     https://goteleport.com/blog/how-saml-authentication-works/
