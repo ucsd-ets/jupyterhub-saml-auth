@@ -36,13 +36,15 @@ def driver_options(pytestconfig):
     if browser == "firefox":
         options = webdriver.FirefoxOptions()
         if headless:
-            options.headless = True
-        return (webdriver.Firefox, options, webdriver.FirefoxProfile)
+            #options.headless = True
+            options.add_argument('--headless')
+        return (webdriver.Firefox, options)
     elif browser == "chrome":
         options = webdriver.ChromeOptions()
         if headless:
-            options.headless = True
-        return (webdriver.Chrome, options, webdriver.ChromeProfile)
+            #options.headless = True
+            options.add_argument('--headless')
+        return (webdriver.Chrome, options)
 
     else:
         raise Exception(f"No browser option available for {browser}")
@@ -50,7 +52,7 @@ def driver_options(pytestconfig):
 
 @pytest.fixture()
 def driver(driver_options):
-    driver_cls, selected_options, _ = driver_options
+    driver_cls, selected_options = driver_options
     driver = driver_cls(options=selected_options)
     yield driver
 
