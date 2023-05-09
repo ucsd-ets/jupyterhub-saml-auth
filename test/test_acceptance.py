@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from redis.commands.json.path import Path as RedisJsonPath
 from jupyterhub_saml_auth.cache import SessionEntry
 
-SECONDS_WAIT = 15
+SECONDS_WAIT = 60
 load_dotenv()
 
 
