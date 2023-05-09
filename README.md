@@ -7,7 +7,7 @@ Authenticate your Jupyterhub users using SAML. This authenticator uses OneLogin'
 
 ## Installation
 
-```bash
+``` bash
 pip install jupyterhub-saml-auth
 ```
 
