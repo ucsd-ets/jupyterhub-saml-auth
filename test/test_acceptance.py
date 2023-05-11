@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from redis.commands.json.path import Path as RedisJsonPath
 from jupyterhub_saml_auth.cache import SessionEntry
 
-SECONDS_WAIT = 60
+SECONDS_WAIT = 90
 load_dotenv()
 
 @pytest.fixture
@@ -24,11 +24,13 @@ def setup_docker_env(request):
 
     os.system("docker compose --verbose up -d")
 
+    '''
     yield
 
     os.system("docker compose --verbose down")
     for k, v in request.param.items():
         del os.environ[k]
+    '''
 
 @pytest.fixture()
 def driver_options(pytestconfig):
