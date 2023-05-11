@@ -10,12 +10,14 @@ from dotenv import load_dotenv
 from redis.commands.json.path import Path as RedisJsonPath
 from jupyterhub_saml_auth.cache import SessionEntry
 
-SECONDS_WAIT = 60
+SECONDS_WAIT = 20
 load_dotenv()
-
 
 @pytest.fixture
 def setup_docker_env(request):
+    # sleep to ensure that previous docker compose calls have completed
+   time.sleep(3)
+
     # set environment variables before test
     for k, v in request.param.items():
         os.environ[k] = v
@@ -46,7 +48,6 @@ def driver_options(pytestconfig):
     else:
         raise Exception(f"No browser option available for {browser}")
 
-
 @pytest.fixture()
 def driver(driver_options):
     driver_cls, selected_options = driver_options
@@ -64,7 +65,7 @@ def login_test(driver):
     wait_for_element(driver, By.CSS_SELECTOR, ".btn").click()
 
     # allow some time for server to spawn
-    time.sleep(10)
+    time.sleep(5)
 
     assert driver.current_url == "http://localhost:8000/user/user1/tree/?"
 
@@ -105,7 +106,6 @@ def test_defaults(setup_docker_env, driver):
     driver = login_test(driver)
     logout_test(driver)
 
-'''
 @pytest.mark.parametrize("setup_docker_env", [{"TEST_ENV": "redis"}], indirect=True)
 def test_redis_cache(setup_docker_env, driver):
     r = redis.Redis(
@@ -126,4 +126,4 @@ def test_redis_cache(setup_docker_env, driver):
         assert value, (field, value)
 
     logout_test(driver)
-'''
+
