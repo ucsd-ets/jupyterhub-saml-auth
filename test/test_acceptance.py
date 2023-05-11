@@ -10,27 +10,22 @@ from dotenv import load_dotenv
 from redis.commands.json.path import Path as RedisJsonPath
 from jupyterhub_saml_auth.cache import SessionEntry
 
-SECONDS_WAIT = 90
+SECONDS_WAIT = 60
 load_dotenv()
 
 @pytest.fixture
 def setup_docker_env(request):
-    # sleep to ensure that previous docker compose calls have completed
-    time.sleep(10)
-
     # set environment variables before test
     for k, v in request.param.items():
         os.environ[k] = v
 
     os.system("docker compose --verbose up -d")
 
-    '''
     yield
 
     os.system("docker compose --verbose down")
     for k, v in request.param.items():
         del os.environ[k]
-    '''
 
 @pytest.fixture()
 def driver_options(pytestconfig):
@@ -94,6 +89,9 @@ def logout_test(driver):
 
 
 def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
+    # Sleep before calling WebDriverWait
+    time.sleep(3)
+    
     return WebDriverWait(driver, SECONDS_WAIT).until(
         expected_conditions.element_to_be_clickable((selector, selector_value))
     )
