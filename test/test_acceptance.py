@@ -28,7 +28,7 @@ def setup_docker_env(request):
     for k, v in request.param.items():
         del os.environ[k]
 
-
+'''
 @pytest.fixture()
 def driver_options(pytestconfig):
     browser = pytestconfig.getoption("browser")
@@ -57,7 +57,30 @@ def driver(driver_options):
     yield driver
 
     driver.quit()
+'''
 
+@pytest.fixture()
+def driver(pytestconfig):
+    browser = pytestconfig.getoption("browser")
+    headless = pytestconfig.getoption('headless')
+
+    if browser == 'firefox':
+        options = webdriver.FirefoxOptions()
+        if headless:
+            options.headless = True
+        driver = webdriver.Firefox(options=options)
+    elif browser == 'chrome':
+        options = webdriver.ChromeOptions()
+        if headless:
+            options.headless = True
+        driver = webdriver.Chrome(options=options)
+
+    else:
+        raise Exception(f'No browser option available for {browser}')
+
+    yield driver
+
+    driver.quit()
 
 def login_test(driver):
     driver.get("http://localhost:8000/hub/saml_login")
