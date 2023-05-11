@@ -41,6 +41,7 @@ def driver_options(pytestconfig):
         options = webdriver.ChromeOptions()
         if headless:
             options.add_argument('--headless')
+        options.page_load_strategy = 'eager'
         return (webdriver.Chrome, options)
 
     else:
@@ -94,12 +95,13 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
     count = 0
     while not isDone:
         if count == 3:
-            raise Exception("TimeoutException after 3 tries...is target element present?")
+            raise Exception("TimeoutException after 3 tries...Is element present?")
             break
         try:
             element = WebDriverWait(driver, SECONDS_WAIT).until(expected_conditions.element_to_be_clickable((selector, selector_value)))
             isDone = True
         except:
+            driver.refresh()
             count += 1
     time.sleep(random.randint(1,5)*0.1)
     return element
