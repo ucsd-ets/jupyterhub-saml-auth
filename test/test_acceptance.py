@@ -16,7 +16,7 @@ load_dotenv()
 @pytest.fixture
 def setup_docker_env(request):
     # sleep to ensure that previous docker compose calls have completed
-   time.sleep(3)
+    time.sleep(3)
 
     # set environment variables before test
     for k, v in request.param.items():
