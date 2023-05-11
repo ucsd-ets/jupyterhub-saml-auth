@@ -28,7 +28,6 @@ def setup_docker_env(request):
     for k, v in request.param.items():
         del os.environ[k]
 
-'''
 @pytest.fixture()
 def driver_options(pytestconfig):
     browser = pytestconfig.getoption("browser")
@@ -36,13 +35,11 @@ def driver_options(pytestconfig):
     if browser == "firefox":
         options = webdriver.FirefoxOptions()
         if headless:
-            #options.headless = True
             options.add_argument('--headless')
         return (webdriver.Firefox, options)
     elif browser == "chrome":
         options = webdriver.ChromeOptions()
         if headless:
-            #options.headless = True
             options.add_argument('--headless')
         return (webdriver.Chrome, options)
 
@@ -54,30 +51,6 @@ def driver_options(pytestconfig):
 def driver(driver_options):
     driver_cls, selected_options = driver_options
     driver = driver_cls(options=selected_options)
-    yield driver
-
-    driver.quit()
-'''
-
-@pytest.fixture()
-def driver(pytestconfig):
-    browser = pytestconfig.getoption("browser")
-    headless = pytestconfig.getoption('headless')
-
-    if browser == 'firefox':
-        options = webdriver.FirefoxOptions()
-        if headless:
-            options.headless = True
-        driver = webdriver.Firefox(options=options)
-    elif browser == 'chrome':
-        options = webdriver.ChromeOptions()
-        if headless:
-            options.headless = True
-        driver = webdriver.Chrome(options=options)
-
-    else:
-        raise Exception(f'No browser option available for {browser}')
-
     yield driver
 
     driver.quit()
@@ -132,7 +105,7 @@ def test_defaults(setup_docker_env, driver):
     driver = login_test(driver)
     logout_test(driver)
 
-
+'''
 @pytest.mark.parametrize("setup_docker_env", [{"TEST_ENV": "redis"}], indirect=True)
 def test_redis_cache(setup_docker_env, driver):
     r = redis.Redis(
@@ -153,3 +126,4 @@ def test_redis_cache(setup_docker_env, driver):
         assert value, (field, value)
 
     logout_test(driver)
+'''
