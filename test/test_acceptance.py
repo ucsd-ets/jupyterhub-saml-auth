@@ -6,6 +6,7 @@ import time
 import pytest
 import os
 import redis
+import random
 from dotenv import load_dotenv
 from redis.commands.json.path import Path as RedisJsonPath
 from jupyterhub_saml_auth.cache import SessionEntry
