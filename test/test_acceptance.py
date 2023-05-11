@@ -22,11 +22,11 @@ def setup_docker_env(request):
     for k, v in request.param.items():
         os.environ[k] = v
 
-    os.system("docker compose up --verbose -d")
+    os.system("docker compose --verbose up -d")
 
     yield
 
-    os.system("docker compose down --verbose")
+    os.system("docker compose --verbose down")
     for k, v in request.param.items():
         del os.environ[k]
 
