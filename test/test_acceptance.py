@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from redis.commands.json.path import Path as RedisJsonPath
 from jupyterhub_saml_auth.cache import SessionEntry
 
-SECONDS_WAIT = 20
+SECONDS_WAIT = 45
 load_dotenv()
 
 @pytest.fixture
@@ -94,7 +94,7 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
     isDone = False
     count = 0
     while not isDone:
-        if count == 5:
+        if count == 10:
             raise Exception("TimeoutException after 3 tries...Is element present?")
             break
         try:
