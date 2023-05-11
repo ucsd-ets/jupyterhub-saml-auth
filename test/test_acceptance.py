@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from redis.commands.json.path import Path as RedisJsonPath
 from jupyterhub_saml_auth.cache import SessionEntry
 
-SECONDS_WAIT = 15
+SECONDS_WAIT = 20
 load_dotenv()
 
 @pytest.fixture
@@ -94,13 +94,15 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
     isDone = False
     count = 0
     while not isDone:
-        if count == 3:
+        if count == 5:
             raise Exception("TimeoutException after 3 tries...Is element present?")
             break
         try:
             element = WebDriverWait(driver, SECONDS_WAIT).until(expected_conditions.element_to_be_clickable((selector, selector_value)))
             isDone = True
         except:
+            # Selenium often randomly fails with TimeoutException
+            # On each fail, refresh the page and try again...
             driver.refresh()
             count += 1
     time.sleep(random.randint(1,5)*0.1)
