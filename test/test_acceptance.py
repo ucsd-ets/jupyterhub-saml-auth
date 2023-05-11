@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from redis.commands.json.path import Path as RedisJsonPath
 from jupyterhub_saml_auth.cache import SessionEntry
 
-SECONDS_WAIT = 60
+SECONDS_WAIT = 15
 load_dotenv()
 
 @pytest.fixture
@@ -89,13 +89,19 @@ def logout_test(driver):
 
 
 def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
-    # Sleep before calling WebDriverWait
-    time.sleep(3)
-    
-    return WebDriverWait(driver, SECONDS_WAIT).until(
-        expected_conditions.element_to_be_clickable((selector, selector_value))
-    )
-
+    isDone = False
+    count = 0
+    while not isDone:
+        if count == 3:
+            raise Exception("TimeoutException after 3 tries...is target element present?")
+            break
+        try:
+            element = WebDriverWait(driver, SECONDS_WAIT).until(expected_conditions.element_to_be_clickable((selector, selector_value)))
+            isDone = True
+        except:
+            count += 1
+    time.sleep(random.randint(1,5)*0.1)
+    return element
 
 @pytest.mark.parametrize("setup_docker_env", [{}], indirect=True)
 def test_defaults(setup_docker_env, driver):
