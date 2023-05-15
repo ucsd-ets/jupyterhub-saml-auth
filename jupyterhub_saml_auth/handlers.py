@@ -98,8 +98,12 @@ class BaseHandlerMixin:
         )
         return onelogin_auth
 
+    def check_xsrf_cookie(self):
+        # no xsrf check needed here
+        return
 
-class MetadataHandler(BaseHandler, BaseHandlerMixin):
+
+class MetadataHandler(BaseHandlerMixin, BaseHandler):
     def get(self):
         auth = self.setup_auth()
         saml_settings = auth.get_settings()
@@ -114,14 +118,14 @@ class MetadataHandler(BaseHandler, BaseHandlerMixin):
             self.write(", ".join(errors))
 
 
-class SamlLoginHandler(LoginHandler, BaseHandlerMixin):
+class SamlLoginHandler(BaseHandlerMixin, LoginHandler):
     async def get(self):
         auth = self.setup_auth()
         return_to = f"{self.request.host}/acs"
         return self.redirect(auth.login(return_to))
 
 
-class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
+class SamlLogoutHandler(BaseHandlerMixin, LogoutHandler):
     @property
     def logout_kwargs(self):
         return self._logout_kwargs
@@ -207,7 +211,7 @@ class SamlLogoutHandler(LogoutHandler, BaseHandlerMixin):
                 self.redirect(url, status=307)
 
 
-class ACSHandler(BaseHandler, BaseHandlerMixin):
+class ACSHandler(BaseHandlerMixin, BaseHandler):
     """Assertion consumer service (ACS) handler.  This handler checks the data
     received via a POST request from a SAML server within the SAML workflow.
     https://goteleport.com/blog/how-saml-authentication-works/
