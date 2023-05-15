@@ -56,7 +56,9 @@ def driver(driver_options):
     driver.quit()
 
 def login_test(driver):
-    driver.get("http://localhost:8000/hub/saml_login")
+    get_page_retry(driver, "http://localhost:8000/hub/saml_login")
+    #driver.get("http://localhost:8000/hub/saml_login")
+    
     wait_for_element(driver, By.ID, "username").send_keys("user1")
 
     wait_for_element(driver, By.ID, "password").send_keys("user1pass")
@@ -84,7 +86,9 @@ def logout_test(driver):
         assert cookie["name"] not in cookies_names_to_check, cookie["name"]
 
     # SLO logout, confirm that clicking login again is logged out of idp
-    driver.get("http://localhost:8000/hub/saml_login")
+    #driver.get("http://localhost:8000/hub/saml_login")
+    get_page_retry(driver, "http://localhost:8000/hub/saml_login")
+    
     assert driver.current_url.startswith("http://localhost:8080")
 
     return driver
@@ -110,6 +114,26 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
             count += 1
     time.sleep(1)
     return element
+
+def get_page_retry(driver, url):
+    isDone = False
+    count = 0
+    while not isDone:
+        if count == 5:
+            raise Exception("Failed to get page following multiple ConnectionReset exceptions...is docker online?")
+            break
+        try:
+            page = driver.get(url)
+            isDone = True
+        except:
+            # driver.get(url) may fail with ConnectionReset
+            # On each fail, refresh and try again...
+            print("ConnectionReset encountered on attempt " + count + ". Trying again...")
+            driver.refresh()
+            time.sleep(3)
+            count += 1
+    time.sleep(1)
+    return page
 
 @pytest.mark.parametrize("setup_docker_env", [{}], indirect=True)
 def test_defaults(setup_docker_env, driver):
