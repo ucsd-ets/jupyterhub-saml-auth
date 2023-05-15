@@ -6,7 +6,6 @@ import time
 import pytest
 import os
 import redis
-import random
 from dotenv import load_dotenv
 from redis.commands.json.path import Path as RedisJsonPath
 from jupyterhub_saml_auth.cache import SessionEntry
@@ -96,7 +95,7 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
     count = 0
     while not isDone:
         if count == 10:
-            raise Exception("TimeoutException after 3 tries...Is element present?")
+            raise Exception("TimeoutException after " + count + " tries...Is element present?")
             break
         try:
             element = WebDriverWait(driver, SECONDS_WAIT).until(expected_conditions.element_to_be_clickable((selector, selector_value)))
@@ -105,8 +104,9 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
             # Selenium often randomly fails with TimeoutException
             # On each fail, refresh the page and try again...
             driver.refresh()
+            time.sleep(2)
             count += 1
-    time.sleep(random.randint(1,5)*0.1)
+    time.sleep(1)
     return element
 
 @pytest.mark.parametrize("setup_docker_env", [{}], indirect=True)

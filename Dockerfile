@@ -22,6 +22,8 @@ RUN apt-get update && \
 COPY . /app
 WORKDIR /app
 
+RUN python3 -m pip install --upgrade pip
+
 RUN python3 setup.py bdist_wheel && \
     pip install dist/*.whl
 
