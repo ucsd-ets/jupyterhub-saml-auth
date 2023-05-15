@@ -82,8 +82,13 @@ c.SAMLAuthenticator.cache_spec = {
 ```
 
 ### Environment variables
-
 - `SAML_HTTPS_OVERRIDE`: setting this will override the automatic detection of `http` or `https` to `/hub/acs` route and will set it to only `https`.
+  - _This may not function as expected unless you modify `/etc/settings.json`. See `assertionConsumerService` below for more details._
+
+### /etc/settings.json
+- `assertionConsumerService`: changing this is also necessary to override automatic detection of `http` or `https` to `/hub/acs`.
+  - Append `/hub/acs/` to the end of `url` _instead_ of `/?acs` or `/hub/saml_login`. Otherwise, you may receive a `405 Method not Allowed` error w/a POST.
+  - _(See [this issue](https://github.com/ucsd-ets/jupyterhub-saml-auth/issues/8) for more information.)_
 
 ### Redis Configuration in Docker Compose
 
