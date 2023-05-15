@@ -52,7 +52,7 @@ jobs:
       run: |
         wget -O FirefoxLatest.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US"
         bzip2 -d FirefoxLatest.tar.bz2
-        tar -xvzf FirefoxLatest.tar
+        tar -xvf FirefoxLatest.tar
         sudo mv firefox /opt
         sudo ln -s /opt/firefox/firefox /usr/local/bin/firefox
     - name: Install geckodriver for Firefox
