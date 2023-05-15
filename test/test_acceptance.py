@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from redis.commands.json.path import Path as RedisJsonPath
 from jupyterhub_saml_auth.cache import SessionEntry
 
-SECONDS_WAIT = 45
+SECONDS_WAIT = 120
 load_dotenv()
 
 @pytest.fixture
@@ -36,6 +36,7 @@ def driver_options(pytestconfig):
         options = webdriver.FirefoxOptions()
         if headless:
             options.add_argument('--headless')
+        options.page_load_strategy = 'eager'
         return (webdriver.Firefox, options)
     elif browser == "chrome":
         options = webdriver.ChromeOptions()

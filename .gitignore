@@ -16,3 +16,4 @@ share/
 *.cfg
 dist/
 browsermob-*
+*.DS_Store
