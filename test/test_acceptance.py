@@ -99,7 +99,7 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
     count = 0
     while not isDone:
         if count == 10:
-            raise Exception("TimeoutException after " + count + " tries...Is element present?")
+            raise Exception("TimeoutException after " + str(count) + " tries...Is element present?")
             break
         try:
             driver.set_page_load_timeout(SECONDS_WAIT)
@@ -108,7 +108,7 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
         except:
             # Selenium often randomly fails with TimeoutException
             # On each fail, refresh the page and try again...
-            print("TimeoutException encountered on attempt " + count + ". Trying again...")
+            print("TimeoutException encountered on attempt " + str(count) + ". Trying again...")
             driver.refresh()
             time.sleep(3)
             count += 1
@@ -120,7 +120,7 @@ def get_page_retry(driver, url):
     count = 0
     while not isDone:
         if count == 5:
-            raise Exception("Failed to get page following multiple ConnectionReset exceptions...is docker online?")
+            raise Exception("Failed to get page following" + str(count) + "ConnectionReset exceptions...is docker online?")
             break
         try:
             page = driver.get(url)
@@ -128,7 +128,7 @@ def get_page_retry(driver, url):
         except:
             # driver.get(url) may fail with ConnectionReset
             # On each fail, refresh and try again...
-            print("ConnectionReset encountered on attempt " + count + ". Trying again...")
+            print("ConnectionReset encountered on attempt " + str(count) + ". Trying again...")
             driver.refresh()
             time.sleep(3)
             count += 1
