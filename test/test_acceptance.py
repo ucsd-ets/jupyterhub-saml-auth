@@ -104,7 +104,7 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
             # Selenium often randomly fails with TimeoutException
             # On each fail, refresh the page and try again...
             driver.refresh()
-            time.sleep(2)
+            time.sleep(3)
             count += 1
     time.sleep(1)
     return element
