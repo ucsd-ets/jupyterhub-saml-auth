@@ -1,4 +1,4 @@
-ARG BASE_IMG=jupyterhub/jupyterhub:3
+ARG BASE_IMG=jupyterhub/jupyterhub:4
 FROM ${BASE_IMG}
 ARG BASE_IMG
 USER root
