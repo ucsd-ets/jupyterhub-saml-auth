@@ -103,14 +103,14 @@ def wait_for_url_match(driver, new_url) -> WebDriverWait:
             raise Exception("Exception after " + str(count) + " tries...URL not correct?")
             break
         try:
-            driver.set_page_load_timeout(SECONDS_WAIT)
-            element = WebDriverWait(driver, SECONDS_WAIT).until(expected_conditions.url_to_be((new_url)))
+            driver.set_page_load_timeout(SECONDS_WAIT/2)
+            element = WebDriverWait(driver, SECONDS_WAIT/2).until(expected_conditions.url_to_be((new_url)))
             isDone = True
         except:
             # Selenium may not have loaded this page yet
             # On each fail, refresh the page and try again...
             print("Exception encountered on attempt " + str(count) + ". Trying again...")
-            driver.refresh()
+            #driver.refresh()
             time.sleep(3)
             count += 1
     time.sleep(1)
@@ -131,7 +131,7 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
             # Selenium often randomly fails with TimeoutException
             # On each fail, refresh the page and try again...
             print("TimeoutException encountered on attempt " + str(count) + ". Trying again...")
-            driver.refresh()
+            #driver.refresh()
             time.sleep(3)
             count += 1
     time.sleep(1)
@@ -142,7 +142,7 @@ def get_page_retry(driver, url):
     count = 0
     while not isDone:
         if count == 5:
-            raise Exception("Failed to get page following" + str(count) + "ConnectionReset exceptions...is docker online?")
+            raise Exception("Failed to get page following " + str(count) + " ConnectionReset exceptions...is docker online?")
             break
         try:
             page = driver.get(url)
@@ -151,8 +151,8 @@ def get_page_retry(driver, url):
             # driver.get(url) may fail with ConnectionReset
             # On each fail, refresh and try again...
             print("ConnectionReset encountered on attempt " + str(count) + ". Trying again...")
-            driver.refresh()
-            time.sleep(3)
+            #driver.refresh()
+            time.sleep(5)
             count += 1
     time.sleep(1)
     return page
