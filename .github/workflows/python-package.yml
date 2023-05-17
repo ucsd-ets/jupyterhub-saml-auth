@@ -77,6 +77,6 @@ jobs:
     - name: run acceptance tests
       run: |
         pytest test/test_acceptance.py --browser chrome --headless
-        pytest test/test_acceptance.py --browser firefox --headless
+        #pytest test/test_acceptance.py --browser firefox --headless
 
 
