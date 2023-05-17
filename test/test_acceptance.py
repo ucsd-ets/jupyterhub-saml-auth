@@ -145,6 +145,7 @@ def get_page_retry(driver, url):
             raise Exception("Failed to get page following " + str(count) + " ConnectionReset exceptions...is docker online?")
             break
         try:
+            driver.set_page_load_timeout(SECONDS_WAIT)
             page = driver.get(url)
             isDone = True
         except:
