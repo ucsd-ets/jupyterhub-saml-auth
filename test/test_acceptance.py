@@ -12,6 +12,7 @@ from jupyterhub_saml_auth.cache import SessionEntry
 
 SECONDS_WAIT = 60
 load_dotenv()
+browser = None
 
 @pytest.fixture
 def setup_docker_env(request):
@@ -29,6 +30,7 @@ def setup_docker_env(request):
 
 @pytest.fixture()
 def driver_options(pytestconfig):
+    global browser
     browser = pytestconfig.getoption("browser")
     headless = pytestconfig.getoption("headless")
     if browser == "firefox":
@@ -110,9 +112,7 @@ def wait_for_url_match(driver, new_url) -> WebDriverWait:
             # Selenium may not have loaded this page yet
             # On each fail, refresh the page and try again...
             print("Exception encountered on attempt " + str(count) + ". Trying again...")
-            driver.refresh()
-            time.sleep(5)
-            count += 1
+            count = refresh_driver(driver, count)
     time.sleep(1)
     return element
 
@@ -131,9 +131,7 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
             # Selenium often randomly fails with TimeoutException
             # On each fail, refresh the page and try again...
             print("TimeoutException encountered on attempt " + str(count) + ". Trying again...")
-            driver.refresh()
-            time.sleep(7)
-            count += 1
+            count = refresh_driver(driver, count)
     time.sleep(1)
     return element
 
@@ -152,11 +150,16 @@ def get_page_retry(driver, url):
             # driver.get(url) may fail with ConnectionReset
             # On each fail, refresh and try again...
             print("ConnectionReset encountered on attempt " + str(count) + ". Trying again...")
-            driver.refresh()
-            time.sleep(7)
-            count += 1
+            count = refresh_driver(driver, count)
     time.sleep(1)
     return page
+
+def refresh_driver(driver, count):
+    time.sleep(7)
+    if (browser != "firefox"):
+        driver.refresh()
+    count += 1
+    return count
 
 @pytest.mark.parametrize("setup_docker_env", [{}], indirect=True)
 def test_defaults(setup_docker_env, driver):
