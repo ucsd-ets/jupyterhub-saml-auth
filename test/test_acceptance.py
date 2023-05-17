@@ -111,7 +111,7 @@ def wait_for_url_match(driver, new_url) -> WebDriverWait:
             # On each fail, refresh the page and try again...
             print("Exception encountered on attempt " + str(count) + ". Trying again...")
             driver.quit()
-            time.sleep(3)
+            time.sleep(5)
             count += 1
     time.sleep(1)
     return element
@@ -132,7 +132,7 @@ def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
             # On each fail, refresh the page and try again...
             print("TimeoutException encountered on attempt " + str(count) + ". Trying again...")
             driver.quit()
-            time.sleep(3)
+            time.sleep(7)
             count += 1
     time.sleep(1)
     return element
@@ -152,7 +152,7 @@ def get_page_retry(driver, url):
             # On each fail, refresh and try again...
             print("ConnectionReset encountered on attempt " + str(count) + ". Trying again...")
             driver.quit()
-            time.sleep(5)
+            time.sleep(7)
             count += 1
     time.sleep(1)
     return page
