@@ -65,10 +65,12 @@ def login_test(driver):
 
     wait_for_element(driver, By.CSS_SELECTOR, ".btn").click()
 
-    # allow some time for server to spawn
-    time.sleep(5)
-
-    assert driver.current_url == "http://localhost:8000/user/user1/tree/?"
+    # Wait for correct URL
+    correct_url = "http://localhost:8000/user/user1/tree?"
+    result = wait_for_url_match(driver, correct_url)
+    
+    assert driver.current_url == correct_url
+    # assert driver.current_url == "http://localhost:8000/user/user1/tree/?"
 
     return driver
 
@@ -93,6 +95,26 @@ def logout_test(driver):
 
     return driver
 
+def wait_for_url_match(driver, new_url) -> WebDriverWait:
+    isDone = False
+    count = 0
+    while not isDone:
+        if count == 3:
+            raise Exception("Exception after " + str(count) + " tries...URL not correct?")
+            break
+        try:
+            driver.set_page_load_timeout(SECONDS_WAIT)
+            element = WebDriverWait(driver, SECONDS_WAIT).until(expected_conditions.url_to_be((new_url)))
+            isDone = True
+        except:
+            # Selenium may not have loaded this page yet
+            # On each fail, refresh the page and try again...
+            print("Exception encountered on attempt " + str(count) + ". Trying again...")
+            driver.refresh()
+            time.sleep(3)
+            count += 1
+    time.sleep(1)
+    return element
 
 def wait_for_element(driver, selector, selector_value) -> WebDriverWait:
     isDone = False
