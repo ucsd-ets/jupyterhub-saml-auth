@@ -191,10 +191,17 @@ class SamlLogoutHandler(BaseHandlerMixin, LogoutHandler):
         """Log the user out, call the custom action, forward the user
         to the logout page
         """
+        
+        # if the user isn't logged in, going to the logout page.
+        # the default behavior is to redirect back to /logout, so this is necessary
+        # to prevent the user from getting thrown an error when they go here without a session
+        if(self.current_user is None):
+            await self.render_logout_page()
+            return
+        
         self.log.info("Hello world")
         await self.default_handle_logout()
         await self.handle_logout()
-        #await self.render_logout_page() 
             
     async def slo_logout(self, username: str):
         auth = self.setup_auth()
