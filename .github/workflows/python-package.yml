@@ -16,7 +16,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        #python-version: [3.7, 3.8, 3.9]
+        python-version: [3.9]
 
     steps:
     - name: Install dependencies
@@ -49,7 +50,17 @@ jobs:
         sudo apt install ./google-chrome-stable_current_amd64.deb
     - name: Install Firefox
       run: |
-        sudo python -m pip install webdrivermanager
+        wget -O FirefoxLatest.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US"
+        bzip2 -d FirefoxLatest.tar.bz2
+        tar -xvf FirefoxLatest.tar
+        sudo mv firefox /opt
+        sudo ln -s /opt/firefox/firefox /usr/local/bin/firefox
+    - name: Install geckodriver for Firefox
+      run: |
+        wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz
+        sudo tar -x geckodriver -zf geckodriver-v0.33.0-linux64.tar.gz -O > /usr/local/bin/geckodriver
+        sudo chmod +x /usr/local/bin/geckodriver
+        sudo python3 -m pip install webdrivermanager
         sudo webdrivermanager firefox --linkpath /usr/local/bin
     - name: Lint with flake8
       run: |
@@ -66,5 +77,6 @@ jobs:
     - name: run acceptance tests
       run: |
         pytest test/test_acceptance.py --browser chrome --headless
+        # pytest test/test_acceptance.py --browser firefox --headless
 
 

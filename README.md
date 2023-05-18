@@ -7,13 +7,13 @@ Authenticate your Jupyterhub users using SAML. This authenticator uses OneLogin'
 
 ## Installation
 
-```bash
+``` bash
 pip install jupyterhub-saml-auth
 ```
 
 ## Configuration
 
-See the `jupyterhub_config.py` example configuration below for how to integrate this package with jupyterhub
+See the `jupyterhub_config.py` example configuration below for how to integrate this package with jupyterhub. For all configuration settings, see `authenticator.py`.
 
 ```python
 def extract_username(acs_handler, attributes):
@@ -30,6 +30,21 @@ c.SAMLAuthenticator.saml_settings_path = '/app/etc'
 # once the user hits 'logout'
 c.SAMLAuthenticator.session_cookie_names = {'PHPSESSIDIDP', 'SimpleSAMLAuthTokenIdp'}
 
+# Sessions can be cached. See Cache section below for more info
+c.SAMLAuthenticator.cache_spec = {
+    'type': 'disabled',
+    'client': None,
+    'client_kwargs': None
+}
+
+# redirect to idp single logout 
+c.SAMLAuthenticator.idp_logout = True
+
+# pass extra properties to the logout handler upon single logout
+# see https://github.com/onelogin/python3-saml/blob/ba572e24fd3028c0e38c8f9dcd02af46ddcc0870/src/onelogin 
+# for all available properties 
+c.SAMLAuthenticator.logout_kwargs = {}
+
 # Function that extracts the username from the SAML attributes.
 c.SAMLAuthenticator.extract_username = extract_username
 
@@ -37,9 +52,53 @@ c.SAMLAuthenticator.extract_username = extract_username
 c.JupyterHub.authenticator_class = 'jupyterhub_saml_auth.SAMLAuthenticator'
 ```
 
-### Environment variables
+### Specify the Cache
 
+Cache is specified by `c.SAMLAuthenticator.cache_spec` and has 3 fields: `type`, `client`, and `client_kwargs`.
+
+`type` currently has three types: `disabled`, `in-memory`, and `redis`.
+
+specifying `client` and `client_kwargs` is not required for `disabled` and `in-memory` types
+
+Example of how to specify `redis` below
+
+```python
+# in jupyterhub_config.py
+import redis
+import os
+
+redis_client = redis.Redis
+# arguments to pass to client upon creation
+redis_kwargs = {
+    'host': os.getenv('REDIS_HOST'),
+    'port': os.getenv('REDIS_PORT')
+}
+
+c.SAMLAuthenticator.cache_spec = {
+    'type': redis,
+    'client': redis_client,
+    'client_kwargs': redis_kwargs
+}
+```
+
+### Environment variables
 - `SAML_HTTPS_OVERRIDE`: setting this will override the automatic detection of `http` or `https` to `/hub/acs` route and will set it to only `https`.
+  - _This may not function as expected unless you modify `/etc/settings.json`. See `assertionConsumerService` below for more details._
+
+### /etc/settings.json
+- `assertionConsumerService`: changing this is also necessary to override automatic detection of `http` or `https` to `/hub/acs`.
+  - Append `/hub/acs` to the end of `url` _instead_ of `/?acs` or `/hub/saml_login`. Otherwise, you may receive a `405 Method not Allowed` error w/a POST.
+  - _(See [this issue](https://github.com/ucsd-ets/jupyterhub-saml-auth/issues/8) for more information.)_
+
+### Redis Configuration in Docker Compose
+
+Create a `.env` file with the following environment variables:
+
+```bash
+REDIS_HOST
+REDIS_PORT
+REDIS_PASSWORD
+```
 
 ## Development
 
