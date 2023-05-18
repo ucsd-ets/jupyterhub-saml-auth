@@ -199,7 +199,6 @@ class SamlLogoutHandler(BaseHandlerMixin, LogoutHandler):
             await self.render_logout_page()
             return
         
-        self.log.info("Hello world")
         await self.default_handle_logout()
         await self.handle_logout()
             
