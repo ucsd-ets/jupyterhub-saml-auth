@@ -170,8 +170,8 @@ class SamlLogoutHandler(BaseHandlerMixin, LogoutHandler):
         if not isinstance(unencrypted_logout, bool):
             raise AttributeError("You must supply a bool as unencrypted_logout")
 
-        self._unencrypted_logout = unencrypted_logout
-
+        self._unencrypted_logout = unencrypted_logout   
+    
     async def default_handle_logout(self):
         """The default logout action
         Optionally cleans up servers, clears cookies, increments logout counter
@@ -187,6 +187,15 @@ class SamlLogoutHandler(BaseHandlerMixin, LogoutHandler):
             self._backend_logout_cleanup(user.name)
             await self.slo_logout(username)
 
+    async def get(self):
+        """Log the user out, call the custom action, forward the user
+        to the logout page
+        """
+        self.log.info("Hello world")
+        await self.default_handle_logout()
+        await self.handle_logout()
+        #await self.render_logout_page() 
+            
     async def slo_logout(self, username: str):
         auth = self.setup_auth()
         for cookie in self.session_cookie_names:
